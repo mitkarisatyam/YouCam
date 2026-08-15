@@ -34,125 +34,150 @@ export default function HistoryPage() {
     setLogging(false)
   }
 
+  // Simulated score mapping for visual diary feel
+  const generateMockScore = (dateStr: string) => {
+    let hash = 0;
+    for (let i = 0; i < dateStr.length; i++) hash = dateStr.charCodeAt(i) + ((hash << 5) - hash);
+    return 80 + (Math.abs(hash) % 18); // Score between 80 and 97
+  }
+
   return (
-    <div className="min-h-screen pb-24">
+    <div className="min-h-screen pb-32 text-[var(--text-primary)] relative">
+      {/* Editorial Background */}
+      <div className="fixed inset-0 -z-10 bg-[var(--bg-primary)] overflow-hidden">
+        <div className="absolute top-[20%] left-[10%] w-[30%] h-[60%] bg-color-mix(in_srgb,var(--text-primary)_5%,transparent) blur-[150px] rounded-full pointer-events-none" />
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2000')] opacity-[0.03] mix-blend-overlay object-cover pointer-events-none" />
+      </div>
+
       <GlassNav />
 
-      <main className="max-w-3xl mx-auto px-6 pt-2 space-y-10">
+      <main className="max-w-4xl mx-auto px-6 pt-16 space-y-16">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20, filter: 'blur(6px)' }}
-          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="flex items-end justify-between"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-10"
         >
-          <div className="space-y-2">
-            <span className="inline-flex items-center gap-2 glass-liquid px-5 py-2 rounded-full text-[10px] uppercase tracking-widest text-[var(--text-muted)] font-mono">
-              📅 Style Timeline
-            </span>
-            <h1 className="font-serif text-4xl lg:text-5xl text-[var(--text-primary)] font-normal">Outfit History</h1>
-            <p className="text-[var(--text-muted)] text-sm">Track what you wear. Never repeat to the same crowd.</p>
+          <div className="space-y-4">
+            <h1 className="font-serif text-6xl text-[var(--text-primary)] font-normal tracking-tight">Your Style Journal</h1>
+            <p className="text-[var(--text-muted)] text-lg max-w-md leading-relaxed">
+              A personal visual diary of your aesthetic timeline. Document your daily looks and contextual decisions.
+            </p>
           </div>
-          <GlassButton variant="primary" onClick={() => setLogging(!logging)}>
-            {logging ? 'Cancel' : '+ Log Today'}
+          <GlassButton variant="primary" onClick={() => setLogging(!logging)} className="px-8 py-4 shrink-0">
+            {logging ? 'Close Journal' : 'Log New Entry ✦'}
           </GlassButton>
         </motion.div>
 
         {/* Log Today Panel */}
         {logging && (
           <motion.div
-            initial={{ opacity: 0, y: -10, height: 0 }}
+            initial={{ opacity: 0, y: -20, height: 0 }}
             animate={{ opacity: 1, y: 0, height: 'auto' }}
-            exit={{ opacity: 0, y: -10, height: 0 }}
-            className="glass-level-3 p-7 rounded-[1.5rem] space-y-5"
+            exit={{ opacity: 0, y: -20, height: 0 }}
+            className="glass-deep p-10 rounded-[2.5rem] space-y-8"
           >
-            <h3 className="font-serif text-xl text-[var(--text-primary)]">What did you wear today?</h3>
-            <div className="grid grid-cols-5 gap-2">
+            <div>
+              <h3 className="font-serif text-3xl mb-2">Record your look</h3>
+              <p className="text-[var(--text-muted)] text-sm">Select the garments that define today's aesthetic.</p>
+            </div>
+            
+            <div className="grid grid-cols-4 sm:grid-cols-6 gap-4">
               {wardrobe.map(item => (
                 <button
                   key={item.id}
                   onClick={() => setSelected(prev => prev.includes(item.id) ? prev.filter(x => x !== item.id) : [...prev, item.id])}
-                  className={`aspect-square rounded-[1rem] overflow-hidden border-2 transition-all ${
-                    selected.includes(item.id) ? 'border-[var(--text-primary)] shadow-lg ring-2 ring-[var(--accent-glow)]' : 'border-transparent hover:border-[var(--border-color)]'
+                  className={`relative aspect-[3/4] rounded-[1rem] overflow-hidden transition-all duration-300 ${
+                    selected.includes(item.id) ? 'ring-2 ring-[var(--text-primary)] ring-offset-4 ring-offset-[var(--bg-primary)] shadow-elevated scale-105' : 'opacity-70 hover:opacity-100 hover:shadow-subtle'
                   }`}
                 >
-                  <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                  <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover grayscale-[20%]" />
+                  {selected.includes(item.id) && (
+                    <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
+                      <span className="bg-[var(--text-primary)] text-[var(--bg-primary)] rounded-full p-1 text-xs">✓</span>
+                    </div>
+                  )}
                 </button>
               ))}
             </div>
-            <input
-              className="w-full p-4 glass-pill rounded-[1.25rem] text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-gold)]"
-              placeholder="Occasion (optional)"
-              value={occasion}
-              onChange={e => setOccasion(e.target.value)}
-            />
-            <div className="flex gap-3">
-              <GlassButton variant="secondary" onClick={() => setLogging(false)} className="flex-1">Cancel</GlassButton>
-              <GlassButton variant="primary" onClick={logToday} disabled={selected.length === 0} className="flex-1">Save ✨</GlassButton>
+            <div className="flex gap-4">
+              <input
+                className="flex-1 px-8 py-4 glass-soft rounded-[2rem] text-base focus:outline-none focus:ring-2 focus:ring-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-all"
+                placeholder="Describe the occasion (e.g., Evening dinner party)"
+                value={occasion}
+                onChange={e => setOccasion(e.target.value)}
+              />
+              <GlassButton variant="primary" onClick={logToday} disabled={selected.length === 0} className="px-10 py-4">
+                Save Entry
+              </GlassButton>
             </div>
           </motion.div>
         )}
 
-        {/* History Timeline */}
+        {/* Visual Timeline */}
         {history.length === 0 ? (
           <ScrollReveal>
-            <div className="text-center py-20 glass-level-3 rounded-[2rem] space-y-4 relative overflow-hidden">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,var(--accent-glow),transparent_70%)] opacity-30 pointer-events-none" />
-              <div className="text-5xl relative z-10">📅</div>
-              <h3 className="font-serif text-2xl text-[var(--text-primary)] relative z-10">Your history is waiting.</h3>
-              <p className="text-sm text-[var(--text-muted)] relative z-10">Click &ldquo;Log Today&rdquo; to start tracking your style decisions.</p>
+            <div className="text-center py-32 space-y-6">
+              <h3 className="font-serif text-4xl text-[var(--text-muted)]">Your journal is empty.</h3>
+              <p className="text-lg text-[var(--text-muted)] opacity-60">Begin documenting your aesthetic journey today.</p>
             </div>
           </ScrollReveal>
         ) : (
-          <div className="relative">
-            {/* Timeline line */}
-            <div className="absolute left-6 top-0 bottom-0 w-px bg-[var(--border-color)]" />
+          <div className="relative pl-4 md:pl-0">
+            {/* Center Timeline line for Desktop, Left for Mobile */}
+            <div className="absolute left-[15px] md:left-1/2 top-0 bottom-0 w-px bg-[color-mix(in_srgb,var(--border-color)_50%,transparent)] -translate-x-1/2" />
 
-            <div className="space-y-6">
+            <div className="space-y-24">
               {history.map((entry, idx) => {
                 const items = getItems(entry.itemIds)
+                const dateObj = new Date(entry.date)
+                const month = dateObj.toLocaleDateString('en-US', { month: 'short' })
+                const day = dateObj.toLocaleDateString('en-US', { day: 'numeric' })
+                const isEven = idx % 2 === 0
+                const score = generateMockScore(entry.id)
+
                 return (
                   <motion.div
                     key={entry.id}
-                    initial={{ opacity: 0, x: -15 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.08 }}
-                    className="pl-14 relative"
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                    className={`relative flex flex-col md:flex-row items-center gap-10 md:gap-0 ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}
                   >
-                    {/* Timeline dot */}
-                    <div className="absolute left-[18px] top-5 w-3.5 h-3.5 rounded-full bg-[var(--text-primary)] border-2 border-[var(--bg-primary)] z-10" />
+                    {/* Timeline Node */}
+                    <div className="absolute left-[15px] md:left-1/2 w-4 h-4 rounded-full glass-crystal border-[3px] border-[var(--text-primary)] -translate-x-1/2 z-10 shadow-[0_0_15px_var(--text-primary)]" />
 
-                    <div className="glass-card glass-reflection p-6 rounded-[1.5rem]">
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <div className="font-serif text-base font-bold text-[var(--text-primary)]">
-                            {new Date(entry.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                    {/* Content Block */}
+                    <div className={`w-full md:w-1/2 pl-12 md:pl-0 ${isEven ? 'md:pr-20 text-left' : 'md:pl-20 md:text-right'}`}>
+                      <h3 className="font-serif text-5xl text-[var(--text-primary)] mb-6">
+                        {month} {day}
+                      </h3>
+                      
+                      <div className={`glass-soft p-8 rounded-[2rem] hover:shadow-elevated transition-shadow duration-500 flex flex-col ${isEven ? 'items-start' : 'md:items-end items-start'}`}>
+                        
+                        {entry.occasion && (
+                          <div className="mb-4 text-xl text-[var(--text-primary)] flex items-center gap-3">
+                            <span className="opacity-80">💍</span> {entry.occasion}
                           </div>
-                          {entry.occasion && (
-                            <div className="text-xs text-[var(--text-muted)] mt-0.5 flex items-center gap-1.5">
-                              <span>💍</span> {entry.occasion}
-                            </div>
-                          )}
+                        )}
+                        
+                        <div className={`flex items-baseline gap-2 mb-8 text-[var(--text-muted)] uppercase tracking-widest text-xs font-medium`}>
+                          <span>Selected: Look {idx + 1}</span>
+                          <span className="px-2">|</span>
+                          <span className="text-[var(--text-primary)]">Score: {score}</span>
                         </div>
-                        <span className="glass-pill px-3 py-1 rounded-full text-[10px] font-mono text-[var(--text-muted)]">
-                          {items.length} items
-                        </span>
-                      </div>
-                      <div className="flex gap-2.5">
-                        {items.map(item => (
-                          <div key={item.id} className="relative group">
-                            <img src={item.imageUrl} alt={item.name} className="w-16 h-16 object-cover rounded-xl group-hover:scale-105 transition-transform" />
-                            <div className="absolute inset-0 bg-black/50 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <span className="text-white text-[9px] text-center px-1">{item.name}</span>
+
+                        {/* Garment Images Row */}
+                        <div className={`flex gap-3 w-full ${isEven ? 'justify-start' : 'md:justify-end justify-start'}`}>
+                          {items.map(item => (
+                            <div key={item.id} className="relative w-20 h-24 rounded-[1rem] overflow-hidden shadow-subtle group">
+                              <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" />
                             </div>
-                          </div>
-                        ))}
-                        <Link
-                          href={`/look?items=${entry.itemIds.join(',')}`}
-                          className="w-16 h-16 rounded-xl border-2 border-dashed border-[var(--border-color)] hover:border-[var(--accent-gold)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--accent-gold)] transition-colors text-xs"
-                        >
-                          Remix
-                        </Link>
+                          ))}
+                        </div>
+                        
                       </div>
                     </div>
                   </motion.div>
