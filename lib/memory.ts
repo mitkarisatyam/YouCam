@@ -34,6 +34,16 @@ export function updateItem(id: string, patch: Partial<WardrobeItem>) {
   saveWardrobe(wardrobe.map(i => i.id === id ? { ...i, ...patch } : i))
 }
 
+export function toggleFavoriteItem(id: string) {
+  const wardrobe = getWardrobe()
+  saveWardrobe(wardrobe.map(i => i.id === id ? { ...i, favorite: !i.favorite } : i))
+}
+
+export function addMultipleItems(items: WardrobeItem[]) {
+  const wardrobe = getWardrobe()
+  saveWardrobe([...items, ...wardrobe])
+}
+
 // ── Hybrid search ────────────────────────────────────────────────────────────
 const SEMANTIC_KEYWORDS: Record<string, string[]> = {
   cozy: ['knit', 'sweater', 'wool', 'cashmere', 'soft', 'cream', 'beige'],
@@ -185,4 +195,143 @@ export function getRediscoveries(): WardrobeItem[] {
   return wardrobe.filter(item =>
     !item.lastWorn || new Date(item.lastWorn).getTime() < cutoff
   ).slice(0, 6)
+}
+
+// ── ContextMirror Storage Extensions ─────────────────────────────────────────
+import type { ContextSetup, DecisionReplayEntry } from '@/types'
+
+const CONTEXT_KEY = 'contextmirror_current_context'
+const DECISION_REPLAY_KEY = 'contextmirror_decision_replay'
+
+export const DEFAULT_CONTEXT: ContextSetup = {
+  occasion: 'wedding',
+  time: 'evening',
+  environment: 'hotel',
+  formality: 'formal',
+  importance: 'very-important',
+  rawNaturalInput: 'I have a wedding at 7 PM in an indoor hotel.',
+}
+
+export function getSavedContext(): ContextSetup {
+  if (typeof window === 'undefined') return DEFAULT_CONTEXT
+  try {
+    const raw = localStorage.getItem(CONTEXT_KEY)
+    return raw ? JSON.parse(raw) : DEFAULT_CONTEXT
+  } catch {
+    return DEFAULT_CONTEXT
+  }
+}
+
+export function saveContext(ctx: ContextSetup) {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(CONTEXT_KEY, JSON.stringify(ctx))
+  }
+}
+
+export function getDecisionHistory(): DecisionReplayEntry[] {
+  if (typeof window === 'undefined') return []
+  try {
+    return JSON.parse(localStorage.getItem(DECISION_REPLAY_KEY) || '[]')
+  } catch {
+    return []
+  }
+}
+
+export function logDecisionReplay(entry: Omit<DecisionReplayEntry, 'id' | 'date'>) {
+  if (typeof window === 'undefined') return
+  const history = getDecisionHistory()
+  const newEntry: DecisionReplayEntry = {
+    ...entry,
+    id: `decision-${Date.now()}`,
+    date: new Date().toISOString().split('T')[0],
+  }
+  localStorage.setItem(DECISION_REPLAY_KEY, JSON.stringify([newEntry, ...history]))
+}
+
+// ── Hair Studio Extensions ───────────────────────────────────────────────────
+import type { HairProfile, HairPreferences } from '@/types'
+
+const HAIR_HISTORY_KEY = 'closetmind_hair_history'
+const HAIR_PREFS_KEY = 'closetmind_hair_prefs'
+
+export function getHairHistory(): HairProfile[] {
+  if (typeof window === 'undefined') return []
+  try {
+    return JSON.parse(localStorage.getItem(HAIR_HISTORY_KEY) || '[]')
+  } catch {
+    return []
+  }
+}
+
+export function logHairAnalysis(profile: HairProfile) {
+  if (typeof window === 'undefined') return
+  const history = getHairHistory()
+  const newProfile = {
+    ...profile,
+    id: `hair-profile-${Date.now()}`,
+    date: new Date().toISOString().split('T')[0],
+  }
+  localStorage.setItem(HAIR_HISTORY_KEY, JSON.stringify([newProfile, ...history]))
+}
+
+export function clearHairHistory() {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(HAIR_HISTORY_KEY)
+  }
+}
+
+const DEFAULT_HAIR_PREFS: HairPreferences = {
+  preferredLength: 'any',
+  maintenancePreference: 'medium',
+  stylePreference: 'versatile',
+  professionalOrCasual: 'balanced',
+  willingToTryBold: false
+}
+
+export function getHairPreferences(): HairPreferences {
+  if (typeof window === 'undefined') return DEFAULT_HAIR_PREFS
+  try {
+    const raw = localStorage.getItem(HAIR_PREFS_KEY)
+    return raw ? JSON.parse(raw) : DEFAULT_HAIR_PREFS
+  } catch {
+    return DEFAULT_HAIR_PREFS
+  }
+}
+
+export function saveHairPreferences(prefs: HairPreferences) {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(HAIR_PREFS_KEY, JSON.stringify(prefs))
+  }
+}
+
+// ── Shopping Assistant Extensions ────────────────────────────────────────────
+import type { TestPurchaseResult } from '@/types'
+
+const SHOPPING_HISTORY_KEY = 'closetmind_shopping_history'
+
+export function getShoppingHistory(): TestPurchaseResult[] {
+  if (typeof window === 'undefined') return []
+  try {
+    const raw = localStorage.getItem(SHOPPING_HISTORY_KEY)
+    return raw ? JSON.parse(raw) : []
+  } catch {
+    return []
+  }
+}
+
+export function logTestPurchase(result: Omit<TestPurchaseResult, 'id' | 'date'>) {
+  if (typeof window === 'undefined') return
+  const history = getShoppingHistory()
+  const newEntry: TestPurchaseResult = {
+    ...result,
+    id: `purchase-test-${Date.now()}`,
+    date: new Date().toISOString().split('T')[0],
+  }
+  localStorage.setItem(SHOPPING_HISTORY_KEY, JSON.stringify([newEntry, ...history]))
+}
+
+export function clearShoppingHistory() {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem(SHOPPING_HISTORY_KEY)
+  }
 }

@@ -88,8 +88,11 @@ function StudioContent() {
   return (
     <div className="min-h-screen bg-[#f7f4ed]">
       <nav className="flex items-center justify-between px-8 py-5 max-w-6xl mx-auto border-b border-[#e8e4da]">
-        <Link href="/dashboard" className="font-serif text-xl text-[#191919]">ClosetMind</Link>
-        <Link href="/dashboard" className="text-sm text-[#6b6b6b] hover:text-[#191919]">← Dashboard</Link>
+        <Link href="/" className="font-serif text-xl text-[#191919]">ContextMirror</Link>
+        <div className="flex items-center gap-6 text-sm text-[#6b6b6b]">
+          <Link href="/test-look" className="font-medium text-[#191919]">Test My Look</Link>
+          <Link href="/dashboard" className="hover:text-[#191919]">← Wardrobe</Link>
+        </div>
       </nav>
 
       <main className="max-w-6xl mx-auto px-6 py-10">
