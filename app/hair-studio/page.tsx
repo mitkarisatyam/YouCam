@@ -125,7 +125,7 @@ export default function HairStudioPage() {
               
               <div className="flex justify-center gap-4">
                 {[0, 1, 2].map(step => (
-                  <div key={step} className={\`h-[2px] transition-all duration-700 \${step <= captureStep ? 'w-16 bg-[var(--text-primary)]' : 'w-8 bg-color-mix(in_srgb,var(--border-color)_50%,transparent)'}\`} />
+                  <div key={step} className={`h-[2px] transition-all duration-700 ${step <= captureStep ? 'w-16 bg-[var(--text-primary)]' : 'w-8 bg-color-mix(in_srgb,var(--border-color)_50%,transparent)'}`} />
                 ))}
               </div>
             </motion.div>

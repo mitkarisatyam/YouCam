@@ -28,7 +28,7 @@ export default function ShoppingAssistantPage() {
     setTimeout(() => {
       // Mock analyzing an uploaded garment
       const item: ShoppingItem = {
-        id: \`shop-\${Date.now()}\`,
+        id: `shop-${Date.now()}`,
         imageUrl: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&q=80',
         category: 'Outerwear',
         color: 'Brown',
@@ -159,7 +159,7 @@ export default function ShoppingAssistantPage() {
                              <span className="text-[var(--text-primary)] font-numeric">{metric.val}/100</span>
                            </div>
                            <div className="h-2 w-full glass-deep rounded-full overflow-hidden">
-                             <motion.div initial={{ width: 0 }} animate={{ width: \`\${metric.val}%\` }} transition={{ duration: 1.5, ease: "easeOut" }} className="h-full bg-[var(--text-primary)]"></motion.div>
+                             <motion.div initial={{ width: 0 }} animate={{ width: `${metric.val}%` }} transition={{ duration: 1.5, ease: "easeOut" }} className="h-full bg-[var(--text-primary)]"></motion.div>
                            </div>
                          </motion.div>
                        ))}

@@ -194,13 +194,13 @@ function TestLookContent() {
               onClick={() => {
                 if (st.s <= step || candidates.length > 0) setStep(st.s as any)
               }}
-              className={\`relative px-8 py-3 text-xs tracking-widest uppercase font-medium transition-all duration-500 whitespace-nowrap rounded-full \${
+              className={`relative px-8 py-3 text-xs tracking-widest uppercase font-medium transition-all duration-500 whitespace-nowrap rounded-full ${
                 step === st.s
                   ? 'text-[var(--bg-primary)] shadow-md'
                   : st.s < step
                   ? 'text-[var(--text-primary)] opacity-80 hover:opacity-100'
                   : 'text-[var(--text-muted)] opacity-50'
-              }\`}
+              }`}
             >
               {step === st.s && (
                 <motion.div
@@ -249,9 +249,9 @@ function TestLookContent() {
                     value={naturalInput}
                     onChange={e => setNaturalInput(e.target.value)}
                     placeholder="e.g. Corporate event at 7 PM in an indoor hotel."
-                    className={\`flex-1 px-8 py-5 rounded-[2rem] glass-soft bg-[color-mix(in_srgb,var(--bg-primary)_50%,transparent)] text-base focus:outline-none focus:ring-2 focus:ring-[var(--text-primary)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-all \${parsing ? 'opacity-50 scale-95 filter blur-sm' : ''}\`}
+                    className={`flex-1 px-8 py-5 rounded-[2rem] glass-soft bg-[color-mix(in_srgb,var(--bg-primary)_50%,transparent)] text-base focus:outline-none focus:ring-2 focus:ring-[var(--text-primary)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-all ${parsing ? 'opacity-50 scale-95 filter blur-sm' : ''}`}
                   />
-                  <GlassButton variant="primary" onClick={handleParseNatural} className={\`px-12 py-5 text-base transition-all rounded-[2rem] shadow-elevated \${parsing ? 'scale-95 opacity-80' : ''}\`}>
+                  <GlassButton variant="primary" onClick={handleParseNatural} className={`px-12 py-5 text-base transition-all rounded-[2rem] shadow-elevated ${parsing ? 'scale-95 opacity-80' : ''}`}>
                     {parsing ? 'Processing...' : 'Execute Context'}
                   </GlassButton>
                 </div>
@@ -356,11 +356,11 @@ function TestLookContent() {
                           setContextState(updated)
                           saveContext(updated)
                         }}
-                        className={\`p-4 rounded-[1.5rem] text-center transition-all duration-300 \${
+                        className={`p-4 rounded-[1.5rem] text-center transition-all duration-300 ${
                           context.occasion === tile.id
                             ? 'bg-[var(--text-primary)] text-[var(--bg-primary)] shadow-elevated scale-105'
                             : 'glass-frosted text-[var(--text-primary)] hover:bg-[color-mix(in_srgb,var(--text-primary)_10%,transparent)] hover:scale-105'
-                        }\`}
+                        }`}
                       >
                         <span className="text-xs font-medium uppercase tracking-widest block">{tile.label}</span>
                       </button>
@@ -618,7 +618,7 @@ function TestLookContent() {
                       ].map(row => (
                         <div key={row.label} className="flex justify-between items-center text-xs uppercase tracking-widest font-medium">
                           <span className="text-[var(--text-muted)]">{row.label}</span>
-                          <span className="font-numeric text-sm text-[var(--text-primary)] bg-[color-mix(in_srgb,var(--surface)_50%,transparent)] px-2 py-1 rounded">{row.val !== 'N/A' ? \`\${row.val}\` : '--'}</span>
+                          <span className="font-numeric text-sm text-[var(--text-primary)] bg-[color-mix(in_srgb,var(--surface)_50%,transparent)] px-2 py-1 rounded">{row.val !== 'N/A' ? `${row.val}` : '--'}</span>
                         </div>
                       ))}
                       
@@ -666,7 +666,7 @@ function TestLookContent() {
 
               <div className="space-y-10 max-w-6xl mx-auto">
                 {candidates.map((candidate, idx) => (
-                  <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.1 }} key={candidate.id} className={\`glass-deep p-6 rounded-[3rem] flex flex-col md:flex-row gap-12 items-center transition-all duration-500 hover:shadow-elevated group \${candidate.isBestMatch ? 'ring-2 ring-[var(--text-primary)] ring-offset-4 ring-offset-[var(--bg-primary)]' : ''}\`}>
+                  <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.1 }} key={candidate.id} className={`glass-deep p-6 rounded-[3rem] flex flex-col md:flex-row gap-12 items-center transition-all duration-500 hover:shadow-elevated group ${candidate.isBestMatch ? 'ring-2 ring-[var(--text-primary)] ring-offset-4 ring-offset-[var(--bg-primary)]' : ''}`}>
                     <div className="w-full md:w-1/3 aspect-[3/4] relative rounded-[2rem] overflow-hidden glass-soft p-2">
                       <img src={candidate.vtoResultUrl} className="w-full h-full object-cover rounded-[1.5rem] grayscale-[10%] group-hover:scale-[1.03] transition-transform duration-[2000ms]" />
                       {candidate.isBestMatch && (
@@ -692,14 +692,14 @@ function TestLookContent() {
                           <div className="absolute inset-0 bg-gradient-to-br from-transparent via-[var(--text-primary)] to-transparent opacity-[0.02]" />
                           <span className="block text-[10px] font-medium uppercase tracking-widest text-[var(--text-primary)] mb-3 relative z-10 glass-crystal px-3 py-1 inline-block rounded-full">Primary Advantage</span>
                           <span className="text-[var(--text-muted)] text-base relative z-10 block mt-2">
-                            {candidate.stressTest?.occasionFit && candidate.stressTest.occasionFit > 85 ? \`Excellent \${context.occasion} fit\` : 'Overall Versatility'}
+                            {candidate.stressTest?.occasionFit && candidate.stressTest.occasionFit > 85 ? `Excellent ${context.occasion} fit` : 'Overall Versatility'}
                           </span>
                         </div>
                         <div className="glass-frosted p-8 rounded-[2rem] relative overflow-hidden">
                           <div className="absolute inset-0 bg-gradient-to-tl from-transparent via-[var(--text-primary)] to-transparent opacity-[0.02]" />
                           <span className="block text-[10px] font-medium uppercase tracking-widest text-[var(--text-primary)] mb-3 relative z-10 glass-crystal px-3 py-1 inline-block rounded-full">Identified Compromise</span>
                           <span className="text-[var(--text-muted)] text-base relative z-10 block mt-2">
-                            {candidate.stressTest?.environmentFit && candidate.stressTest.environmentFit < 80 ? \`Not ideal for \${context.environment}\` : 'Less versatile'}
+                            {candidate.stressTest?.environmentFit && candidate.stressTest.environmentFit < 80 ? `Not ideal for ${context.environment}` : 'Less versatile'}
                           </span>
                         </div>
                       </div>
@@ -782,18 +782,18 @@ function TestLookContent() {
                       <BeforeAfterSlider
                         beforeImage={selectedCandidate.vtoResultUrl || ''}
                         afterImage="https://images.unsplash.com/photo-1594938298603-c8148c4b4e5b?w=600&q=80" // Mock image for now
-                        beforeLabel={\`PREVIOUS (\${experiment.beforeScore})\`}
-                        afterLabel={\`REVISED (\${experiment.afterScore})\`}
+                        beforeLabel={`PREVIOUS (${experiment.beforeScore})`}
+                        afterLabel={`REVISED (${experiment.afterScore})`}
                       />
                     </div>
                     
                     <div className="space-y-10">
                       <h3 className="font-serif text-5xl font-normal text-[var(--text-primary)] border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-6">Substitution Analysis</h3>
                       
-                      <div className={\`p-12 rounded-[2.5rem] \${experiment.scoreDelta >= 0 ? 'glass-deep ring-2 ring-[var(--text-primary)] ring-offset-4 ring-offset-[var(--bg-primary)]' : 'glass-frosted'}\`}>
+                      <div className={`p-12 rounded-[2.5rem] ${experiment.scoreDelta >= 0 ? 'glass-deep ring-2 ring-[var(--text-primary)] ring-offset-4 ring-offset-[var(--bg-primary)]' : 'glass-frosted'}`}>
                         <span className="glass-crystal px-4 py-2 rounded-full text-xs font-medium uppercase tracking-widest inline-block mb-6 text-[var(--text-muted)]">Net Viability Shift</span>
                         <div className="flex items-end gap-4 mb-8">
-                          <span className={\`text-8xl font-numeric font-light tracking-tighter \${experiment.scoreDelta >= 0 ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}\`}>
+                          <span className={`text-8xl font-numeric font-light tracking-tighter ${experiment.scoreDelta >= 0 ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`}>
                             {experiment.scoreDelta > 0 ? '+' : ''}{experiment.scoreDelta}
                           </span>
                           <span className="text-sm uppercase tracking-widest text-[var(--text-muted)] mb-3">Points</span>
@@ -854,16 +854,16 @@ function TestLookContent() {
                       <button
                         key={c.id}
                         onClick={() => setUserChoice(c.id)}
-                        className={\`p-8 rounded-[2rem] text-left transition-all duration-300 relative overflow-hidden group \${
+                        className={`p-8 rounded-[2rem] text-left transition-all duration-300 relative overflow-hidden group ${
                           userChoice === c.id
                             ? 'bg-[var(--text-primary)] text-[var(--bg-primary)] shadow-elevated scale-105'
                             : 'glass-soft text-[var(--text-primary)] hover:bg-[color-mix(in_srgb,var(--text-primary)_10%,transparent)] hover:scale-[1.02]'
-                        }\`}
+                        }`}
                       >
                         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white to-transparent opacity-[0.05]" />
                         <div className="font-serif text-3xl mb-4 relative z-10">{c.name}</div>
                         <div className="text-xs uppercase tracking-widest opacity-80 relative z-10">Viability: <span className="font-numeric">{c.contextMirrorScore}</span></div>
-                        {c.isBestMatch && <div className={\`text-[10px] mt-6 uppercase tracking-widest font-medium inline-block px-3 py-1 rounded-full relative z-10 \${userChoice === c.id ? 'bg-[var(--bg-primary)] text-[var(--text-primary)] opacity-90' : 'glass-crystal text-[var(--text-primary)]'}\`}>Algorithmic Optimum</div>}
+                        {c.isBestMatch && <div className={`text-[10px] mt-6 uppercase tracking-widest font-medium inline-block px-3 py-1 rounded-full relative z-10 ${userChoice === c.id ? 'bg-[var(--bg-primary)] text-[var(--text-primary)] opacity-90' : 'glass-crystal text-[var(--text-primary)]'}`}>Algorithmic Optimum</div>}
                       </button>
                     ))}
                   </div>
