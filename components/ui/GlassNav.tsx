@@ -63,25 +63,25 @@ export function GlassNav() {
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
     >
       <div
-        className={\`glass-deep rounded-full flex items-center justify-between transition-all duration-500 \${
+        className={`glass-deep rounded-full flex items-center justify-between transition-all duration-500 ${
           scrolled ? 'px-5 py-2.5 shadow-elevated scale-[0.98]' : 'px-6 py-3 shadow-subtle'
-        }\`}
+        }`}
       >
         {/* Brand */}
         <div className="flex items-center gap-3">
           <Link href="/" className="font-serif tracking-tight hover:opacity-80 transition-opacity flex items-center group relative overflow-hidden">
             <motion.span
               layoutId="brand"
-              className={\`transition-all duration-500 font-medium relative z-10 \${scrolled ? 'text-lg' : 'text-xl'}\`}
+              className={`transition-all duration-500 font-medium relative z-10 ${scrolled ? 'text-lg' : 'text-xl'}`}
             >
               ContextMirror
             </motion.span>
             {/* Soft highlight sweep on brand hover */}
             <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-[var(--text-primary)] to-transparent opacity-[0.05] z-0" />
           </Link>
-          <span className={\`premium-badge transition-all duration-500 \${
+          <span className={`premium-badge transition-all duration-500 ${
             scrolled ? 'opacity-0 w-0 overflow-hidden px-0 border-0' : 'opacity-100'
-          }\`}>
+          }`}>
             {isMock ? 'Demo' : 'YouCam'}
           </span>
         </div>
@@ -94,11 +94,11 @@ export function GlassNav() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={\`relative px-4 py-1.5 rounded-full text-sm font-medium transition-colors \${
+                className={`relative px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
                   isActive 
                     ? 'text-[var(--text-inverse)]' 
                     : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                }\`}
+                }`}
               >
                 {isActive && (
                   <motion.div
@@ -120,7 +120,7 @@ export function GlassNav() {
           <button
             onClick={toggleAppearance}
             className="w-8 h-8 flex items-center justify-center rounded-full text-sm hover:bg-[var(--bg-muted)] transition-colors border border-transparent hover:border-[var(--border-color)] group relative overflow-hidden"
-            title={\`Appearance: \${appearance}\`}
+            title={`Appearance: ${appearance}`}
           >
             <span className="relative z-10">{appearance === 'light' ? '☀️' : '🌙'}</span>
           </button>

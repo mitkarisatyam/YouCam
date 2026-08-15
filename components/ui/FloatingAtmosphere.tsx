@@ -41,7 +41,7 @@ export function FloatingAtmosphere() {
     <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden opacity-30">
       {elements.map((el, idx) => (
         <motion.div
-          key={\`\${pathname}-\${idx}\`}
+          key={`${pathname}-${idx}`}
           className="absolute"
           style={{
             left: el.x,

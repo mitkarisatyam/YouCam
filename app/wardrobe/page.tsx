@@ -70,8 +70,8 @@ export default function WardrobePage() {
     setIsUploading(true)
     setTimeout(() => {
       const newItems: WardrobeItem[] = uploadFiles.map((file, idx) => ({
-        id: \`item-\${Date.now()}-\${idx}\`,
-        name: \`New Item \${idx + 1}\`,
+        id: `item-${Date.now()}-${idx}`,
+        name: `New Item ${idx + 1}`,
         category: 'clothing',
         subcategory: 'Unknown',
         color: 'Unknown',
@@ -179,9 +179,9 @@ export default function WardrobePage() {
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={\`relative px-8 py-3 text-sm tracking-widest uppercase font-medium transition-all whitespace-nowrap rounded-[1.5rem] \${
+                className={`relative px-8 py-3 text-sm tracking-widest uppercase font-medium transition-all whitespace-nowrap rounded-[1.5rem] ${
                   activeCategory === cat ? 'text-[var(--bg-primary)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                }\`}
+                }`}
               >
                 {activeCategory === cat && (
                   <motion.div layoutId="wardrobeCat" className="absolute inset-0 bg-[var(--text-primary)] -z-10 shadow-md rounded-[1.5rem]" />
@@ -279,7 +279,7 @@ export default function WardrobePage() {
                      ))}
                    </div>
                    <GlassButton variant="primary" onClick={commitUploads} disabled={isUploading} className="w-full py-5 text-base">
-                     {isUploading ? 'Processing and Tagging...' : \`Commit \${uploadPreviews.length} Items\`}
+                     {isUploading ? 'Processing and Tagging...' : `Commit ${uploadPreviews.length} Items`}
                    </GlassButton>
                  </motion.div>
                )}

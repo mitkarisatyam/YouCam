@@ -138,16 +138,16 @@ export function CinematicAtmosphere() {
             key={p.id}
             className="absolute rounded-full"
             style={{
-              left: \`\${p.x}%\`,
-              top: \`\${p.y}%\`,
+              left: `${p.x}%`,
+              top: `${p.y}%`,
               width: p.size,
               height: p.size,
               background: config.particleColor,
-              boxShadow: \`0 0 \${p.size * 2}px \${config.particleColor}\`
+              boxShadow: `0 0 ${p.size * 2}px ${config.particleColor}`
             }}
             animate={{
               y: ['0vh', '-20vh'],
-              x: ['0vw', \`\${Math.random() * 10 - 5}vw\`],
+              x: ['0vw', `${Math.random() * 10 - 5}vw`],
               opacity: [0, 0.8, 0],
             }}
             transition={{
