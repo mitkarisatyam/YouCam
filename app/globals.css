@@ -338,6 +338,34 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════ */
+/* ── CURSOR INTERACTION EFFECTS ──────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+/* 3D Tilt Base */
+.tilt-card {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  transition: transform 0.4s var(--transition-smooth);
+}
+
+.tilt-card:hover {
+  transform: rotateX(2deg) rotateY(-2deg) scale3d(1.02, 1.02, 1.02);
+}
+
+.tilt-card.tilt-reverse:hover {
+  transform: rotateX(-2deg) rotateY(2deg) scale3d(1.02, 1.02, 1.02);
+}
+
+/* Magnetic Button Pull Base */
+.magnetic-btn {
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.magnetic-btn:hover {
+  transform: translate(0, -2px) scale(1.02);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
 /* ── REDUCED MOTION ──────────────────────────────────────────────────────── */
 /* ═══════════════════════════════════════════════════════════════════════════ */
 

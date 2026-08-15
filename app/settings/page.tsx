@@ -130,22 +130,46 @@ export default function SettingsPage() {
             {/* 2. THEME */}
             <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="space-y-6">
               <h2 className="text-xs uppercase tracking-widest font-medium border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-4">Visual Theme</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {THEMES.map(theme => (
-                  <button
-                    key={theme.id}
-                    onClick={() => changeTheme(theme.id)}
-                    className={`p-6 rounded-[2rem] text-left transition-all duration-500 relative overflow-hidden group ${
-                      currentTheme === theme.id
-                        ? 'ring-2 ring-[var(--text-primary)] ring-offset-4 ring-offset-[var(--bg-primary)] glass-deep shadow-elevated'
-                        : 'glass-frosted hover:glass-soft'
-                    }`}
-                  >
-                    <span className="text-2xl block mb-4 group-hover:scale-110 transition-transform">{theme.icon}</span>
-                    <span className="text-sm font-medium block text-[var(--text-primary)]">{theme.name}</span>
-                    <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider block mt-1">{theme.mode}</span>
-                  </button>
-                ))}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 relative z-10">
+                {THEMES.map(theme => {
+                  const isActive = currentTheme === theme.id;
+                  return (
+                    <motion.button
+                      layout
+                      key={theme.id}
+                      onClick={() => changeTheme(theme.id)}
+                      className={`p-8 rounded-[2.5rem] text-left transition-all duration-500 relative overflow-hidden group tilt-card ${
+                        isActive
+                          ? 'text-[var(--bg-primary)] shadow-elevated scale-105'
+                          : 'glass-frosted hover:glass-soft hover:shadow-subtle text-[var(--text-primary)]'
+                      }`}
+                    >
+                      {isActive && (
+                        <motion.div 
+                          layoutId="activeThemePortal" 
+                          className="absolute inset-0 bg-[var(--text-primary)] -z-10 rounded-[2.5rem]" 
+                          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                        />
+                      )}
+                      
+                      {/* Theme Icon Morphing */}
+                      <motion.span 
+                        layout 
+                        className={`text-3xl block mb-6 transition-transform duration-700 ${isActive ? 'scale-125 rotate-12 drop-shadow-md' : 'group-hover:scale-110 group-hover:rotate-6'}`}
+                      >
+                        {theme.icon}
+                      </motion.span>
+                      
+                      <motion.span layout className="text-base font-medium block relative z-10">{theme.name}</motion.span>
+                      <motion.span layout className={`text-[10px] uppercase tracking-widest block mt-2 relative z-10 ${isActive ? 'text-[var(--bg-primary)] opacity-80' : 'text-[var(--text-muted)]'}`}>{theme.mode}</motion.span>
+                      
+                      {/* Portal Glow Effect */}
+                      {isActive && (
+                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 blur-3xl rounded-full translate-x-10 -translate-y-10" />
+                      )}
+                    </motion.button>
+                  )
+                })}
               </div>
             </motion.section>
 

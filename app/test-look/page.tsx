@@ -598,34 +598,61 @@ function TestLookContent() {
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div className="space-y-16">
                 {candidates.map((candidate, idx) => (
-                  <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: idx * 0.1 }} key={candidate.id} className="glass-deep p-4 rounded-[2.5rem] space-y-6 flex flex-col group cursor-pointer transition-all duration-500 hover:shadow-elevated hover:-translate-y-2" onClick={() => { setSelectedCandidate(candidate); setStep(5); }}>
-                    <div className="aspect-[3/4] relative rounded-[2rem] overflow-hidden">
-                      <img src={candidate.vtoResultUrl} className="w-full h-full object-cover grayscale-[10%] transition-transform duration-[2000ms] group-hover:scale-[1.05]" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-transparent to-transparent opacity-90" />
-                      <div className="absolute bottom-6 left-6 right-6">
-                        <div className="text-[var(--text-primary)] font-serif text-3xl font-normal leading-tight">{candidate.name}</div>
-                      </div>
+                  <motion.div 
+                    initial={{ opacity: 0, y: 50 }} 
+                    animate={{ opacity: 1, y: 0 }} 
+                    transition={{ delay: idx * 0.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }} 
+                    key={candidate.id} 
+                    className="relative glass-deep rounded-[3rem] overflow-hidden group cursor-pointer tilt-card" 
+                    onClick={() => { setSelectedCandidate(candidate); setStep(5); }}
+                  >
+                    {/* Runway Belt Animation Layer */}
+                    <div className="absolute inset-0 z-0 flex items-center overflow-hidden opacity-20 group-hover:opacity-40 transition-opacity duration-1000 pointer-events-none">
+                       <motion.div
+                         animate={{ x: [0, -1500] }}
+                         transition={{ ease: "linear", duration: 25, repeat: Infinity }}
+                         className="flex gap-40 items-center whitespace-nowrap font-serif text-6xl md:text-8xl text-[color-mix(in_srgb,var(--text-primary)_30%,transparent)]"
+                       >
+                         <span>☀️ Daylight</span>
+                         <span>🏛 Indoor</span>
+                         <span>🌙 Evening</span>
+                         <span>📸 Photography</span>
+                         <span>☀️ Daylight</span>
+                         <span>🏛 Indoor</span>
+                         <span>🌙 Evening</span>
+                         <span>📸 Photography</span>
+                       </motion.div>
                     </div>
-                    
-                    <div className="space-y-5 flex-1 px-4 pb-4">
-                      {[
-                        { label: 'Occasion Fit', val: candidate.stressTest?.occasionFit },
-                        { label: 'Context Stability', val: candidate.stabilityScore },
-                        { label: 'Profile Viability', val: hasActualProfile ? candidate.stressTest?.profileCompatibility : 'N/A' },
-                        { label: 'Style Match', val: candidate.stressTest?.stylePreference },
-                      ].map(row => (
-                        <div key={row.label} className="flex justify-between items-center text-xs uppercase tracking-widest font-medium">
-                          <span className="text-[var(--text-muted)]">{row.label}</span>
-                          <span className="font-numeric text-sm text-[var(--text-primary)] bg-[color-mix(in_srgb,var(--surface)_50%,transparent)] px-2 py-1 rounded">{row.val !== 'N/A' ? `${row.val}` : '--'}</span>
-                        </div>
-                      ))}
+
+                    {/* Outfit Centered in Runway */}
+                    <div className="relative z-10 flex flex-col md:flex-row p-8 gap-12 items-center bg-gradient-to-r from-[var(--bg-primary)] via-transparent to-[var(--bg-primary)]">
+                      <div className="w-full md:w-1/3 aspect-[3/4] relative rounded-[2rem] overflow-hidden shadow-elevated">
+                        <img src={candidate.vtoResultUrl} className="w-full h-full object-cover grayscale-[10%] transition-transform duration-[2000ms] group-hover:scale-[1.05]" />
+                      </div>
                       
-                      <div className="flex justify-between items-center pt-6 mt-4 border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">
-                        <span className="text-xs uppercase tracking-widest font-medium text-[var(--text-primary)]">Definitive Score</span>
-                        <div className="glass-crystal rounded-full p-2 shadow-subtle bg-white/5">
-                          <ScoreRing score={candidate.contextMirrorScore || 0} size={60} />
+                      <div className="flex-1 space-y-8 glass-soft p-10 rounded-[2.5rem]">
+                        <h3 className="font-serif text-4xl font-normal text-[var(--text-primary)] leading-tight border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-4">{candidate.name}</h3>
+                        
+                        <div className="grid grid-cols-2 gap-6">
+                          {[
+                            { label: 'Occasion Fit', val: candidate.stressTest?.occasionFit },
+                            { label: 'Profile Viability', val: hasActualProfile ? candidate.stressTest?.profileCompatibility : 'N/A' },
+                            { label: 'Style Match', val: candidate.stressTest?.stylePreference },
+                          ].map(row => (
+                            <div key={row.label} className="flex justify-between items-center text-xs uppercase tracking-widest font-medium glass-frosted px-4 py-3 rounded-xl">
+                              <span className="text-[var(--text-muted)]">{row.label}</span>
+                              <span className="font-numeric text-sm text-[var(--text-primary)]">{row.val !== 'N/A' ? `${row.val}` : '--'}</span>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        <div className="flex justify-between items-center pt-6">
+                          <span className="text-sm uppercase tracking-widest font-medium text-[var(--text-primary)]">Context Stability Score</span>
+                          <div className="glass-crystal rounded-full p-2 shadow-elevated bg-[var(--text-primary)] text-[var(--bg-primary)] flex items-center justify-center w-20 h-20">
+                             <span className="font-numeric text-3xl font-light">{candidate.stabilityScore}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -682,8 +709,19 @@ function TestLookContent() {
                           <h3 className="font-serif text-5xl font-normal text-[var(--text-primary)] leading-tight">{candidate.name}</h3>
                           <p className="text-base text-[var(--text-muted)] mt-4 leading-relaxed max-w-xl">{candidate.explanation}</p>
                         </div>
-                        <div className="text-8xl font-numeric font-light text-[var(--text-primary)] tracking-tighter">
-                          {candidate.contextMirrorScore}
+                        <div className="relative w-40 h-40 flex items-center justify-center">
+                          {/* Converging Metrics */}
+                          <motion.div initial={{ opacity: 0, x: -60, y: -60 }} animate={{ opacity: [0, 1, 0], x: [-60, 0], y: [-60, 0] }} transition={{ duration: 1.5, delay: idx * 0.1, ease: "easeInOut" }} className="absolute text-[10px] uppercase tracking-widest font-medium text-[var(--text-muted)] whitespace-nowrap">Occasion {candidate.stressTest?.occasionFit}</motion.div>
+                          <motion.div initial={{ opacity: 0, x: 60, y: -60 }} animate={{ opacity: [0, 1, 0], x: [60, 0], y: [-60, 0] }} transition={{ duration: 1.5, delay: idx * 0.1 + 0.1, ease: "easeInOut" }} className="absolute text-[10px] uppercase tracking-widest font-medium text-[var(--text-muted)] whitespace-nowrap">Style {candidate.stressTest?.stylePreference}</motion.div>
+                          <motion.div initial={{ opacity: 0, x: 0, y: 60 }} animate={{ opacity: [0, 1, 0], x: [0, 0], y: [60, 0] }} transition={{ duration: 1.5, delay: idx * 0.1 + 0.2, ease: "easeInOut" }} className="absolute text-[10px] uppercase tracking-widest font-medium text-[var(--text-muted)] whitespace-nowrap">Stability {candidate.stabilityScore}</motion.div>
+                          
+                          {/* Final Score Reveal */}
+                          <motion.div initial={{ opacity: 0, scale: 0.5, filter: 'blur(10px)' }} animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }} transition={{ delay: idx * 0.1 + 1.2, type: 'spring', damping: 12 }} className="text-8xl font-numeric font-light text-[var(--text-primary)] tracking-tighter z-10">
+                            {candidate.contextMirrorScore}
+                          </motion.div>
+                          
+                          {/* Impact Ring */}
+                          <motion.div initial={{ opacity: 0, scale: 0 }} animate={{ opacity: [0, 1, 0], scale: [0, 1.5, 2] }} transition={{ delay: idx * 0.1 + 1.2, duration: 1 }} className="absolute inset-0 border border-[var(--text-primary)] rounded-full z-0 pointer-events-none" />
                         </div>
                       </div>
 

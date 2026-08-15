@@ -4,6 +4,7 @@ import { CinematicAtmosphere } from '@/components/ui/CinematicAtmosphere'
 import { FloatingAtmosphere } from '@/components/ui/FloatingAtmosphere'
 import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher'
 import { PageTransition } from '@/components/ui/PageTransition'
+import { CursorInteraction } from '@/components/ui/CursorInteraction'
 
 export const metadata: Metadata = {
   title: 'ContextMirror — Fashion & Beauty AI Simulator',
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Living Animated Background System */}
         <CinematicAtmosphere />
         <FloatingAtmosphere />
+        <CursorInteraction />
 
         {/* Page Content & Motion Transitions */}
         <PageTransition>

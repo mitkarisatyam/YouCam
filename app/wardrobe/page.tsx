@@ -356,23 +356,39 @@ export default function WardrobePage() {
                            </div>
                          </div>
                          
-                         {/* Fashion Lookbook Composition */}
+                         {/* Fashion Lookbook Composition - Wardrobe Assembly Animation */}
                          <div className="flex-1 flex gap-6 mb-10">
                            {/* Main item (Top/Outerwear) */}
-                           <div className="w-1/2 glass-soft p-2 rounded-[2rem] overflow-hidden group/item cursor-pointer relative">
+                           <motion.div 
+                             initial={{ x: -100, y: -50, opacity: 0, rotate: -10 }} 
+                             animate={{ x: 0, y: 0, opacity: 1, rotate: 0 }} 
+                             transition={{ type: 'spring', damping: 15, delay: idx * 0.1 + 0.3 }} 
+                             className="w-1/2 glass-soft p-2 rounded-[2rem] overflow-hidden group/item cursor-pointer relative tilt-card"
+                           >
                              <img src={look.items[0]?.imageUrl} className="w-full h-full object-cover rounded-[1.5rem] grayscale-[10%] group-hover/item:scale-105 transition-transform duration-[2000ms]" />
-                           </div>
+                           </motion.div>
                            <div className="w-1/2 flex flex-col gap-6">
                              {/* Bottom */}
-                             <div className="flex-1 glass-soft p-2 rounded-[2rem] overflow-hidden group/item cursor-pointer relative">
+                             <motion.div 
+                               initial={{ x: 100, y: 50, opacity: 0, rotate: 10 }} 
+                               animate={{ x: 0, y: 0, opacity: 1, rotate: 0 }} 
+                               transition={{ type: 'spring', damping: 15, delay: idx * 0.1 + 0.5 }} 
+                               className="flex-1 glass-soft p-2 rounded-[2rem] overflow-hidden group/item cursor-pointer relative tilt-card tilt-reverse"
+                             >
                                <img src={look.items[1]?.imageUrl} className="w-full h-full object-cover rounded-[1.5rem] grayscale-[10%] group-hover/item:scale-105 transition-transform duration-[2000ms]" />
-                             </div>
+                             </motion.div>
                              {/* Shoes/Accessories */}
                              <div className="h-32 flex gap-6">
                                {look.items.slice(2).map((item, i) => (
-                                 <div key={i} className="flex-1 glass-soft p-1 rounded-3xl overflow-hidden group/item cursor-pointer relative">
+                                 <motion.div 
+                                   initial={{ y: 100, opacity: 0 }} 
+                                   animate={{ y: 0, opacity: 1 }} 
+                                   transition={{ type: 'spring', damping: 15, delay: idx * 0.1 + 0.7 + (i * 0.1) }} 
+                                   key={i} 
+                                   className="flex-1 glass-soft p-1 rounded-3xl overflow-hidden group/item cursor-pointer relative tilt-card"
+                                 >
                                    <img src={item.imageUrl} className="w-full h-full object-cover rounded-[1.25rem] grayscale-[10%] group-hover/item:scale-105 transition-transform duration-[2000ms]" />
-                                 </div>
+                                 </motion.div>
                                ))}
                              </div>
                            </div>

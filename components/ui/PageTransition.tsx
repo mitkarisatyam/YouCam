@@ -64,7 +64,7 @@ export function PageTransition({ children }: { children: ReactNode }) {
         initial={variants.initial}
         animate={variants.animate}
         exit={variants.exit}
-        transition={variants.transition}
+        transition={variants.transition as any}
         className="w-full min-h-screen perspective-1000 origin-center"
       >
         {children}
