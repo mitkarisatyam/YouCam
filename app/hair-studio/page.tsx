@@ -26,9 +26,9 @@ export default function HairStudioPage() {
   // Capture State
   const [captureStep, setCaptureStep] = useState<number>(0)
   const captureInstructions = [
-    { title: '01 Front', desc: 'Look straight at the camera.' },
-    { title: '02 Right', desc: 'Slowly turn your head right.' },
-    { title: '03 Left', desc: 'Slowly turn your head left.' }
+    { title: 'Front Profile', desc: 'Maintain a neutral expression, looking directly into the lens.' },
+    { title: 'Right Profile', desc: 'Turn slowly to expose the right side of your face and hair.' },
+    { title: 'Left Profile', desc: 'Turn slowly to expose the left side.' }
   ]
 
   useEffect(() => {
@@ -37,12 +37,10 @@ export default function HairStudioPage() {
 
   async function runAnalysis() {
     setView('analyzing')
-    // Mock API Call
     const result = await hairAnalyzer.analyze({ frontImage: 'mock' })
     setProfile(result)
     logHairAnalysis(result)
     
-    // Generate Recommendations
     if (preferences) {
       setRecommendedStyles(recommendHairstyles(result, preferences))
     }
@@ -53,50 +51,42 @@ export default function HairStudioPage() {
   async function runTryOn(style: HairstyleCandidate) {
     setSelectedStyle(style)
     setView('vto')
-    setVtoResult({ candidateId: style.id, originalImageUrl: '', resultImageUrl: '', status: 'pending' }) // Reset
+    setVtoResult({ candidateId: style.id, originalImageUrl: '', resultImageUrl: '', status: 'pending' })
     
     const result = await hairstyleTryOn.generate({ userImage: 'mock_user.jpg', candidateId: style.id })
     setVtoResult(result)
   }
 
   return (
-    <div className="min-h-screen pb-24 text-[var(--text-primary)]">
-      {/* Animated Hair/Fabric Background */}
-      <div className="fixed inset-0 -z-10 bg-[var(--bg-primary)] overflow-hidden">
-        <div className="absolute top-[-10%] left-[20%] w-[60%] h-[70%] bg-[var(--accent-gold)] rounded-full blur-[120px] opacity-20 animate-pulse-slow"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#b89f89] rounded-full blur-[100px] opacity-10"></div>
-        {/* Subtle curved lines simulating hair strands */}
-        <svg className="absolute inset-0 w-full h-full opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
-          <path d="M-100,500 C200,200 400,800 1200,300" fill="none" stroke="currentColor" strokeWidth="2" />
-          <path d="M-100,600 C300,100 500,900 1200,400" fill="none" stroke="currentColor" strokeWidth="1" />
-        </svg>
-      </div>
-      
+    <div className="min-h-screen pb-24 font-ui text-[var(--text-primary)]">
       <GlassNav />
 
-      <main className="max-w-6xl mx-auto px-6 pt-4">
+      <main className="max-w-[85rem] mx-auto px-6 pt-12">
         <AnimatePresence mode="wait">
 
           {/* 1. LANDING SCREEN */}
           {view === 'landing' && (
-            <motion.div key="landing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: -20 }} className="flex flex-col items-center text-center mt-12 space-y-8">
-              <div className="w-full max-w-4xl rounded-[3rem] overflow-hidden aspect-[21/9] relative shadow-2xl mb-8">
-                <img src="https://images.unsplash.com/photo-1522337660859-02fbefca4702?w=1200&q=80" className="w-full h-full object-cover" alt="Hair Studio" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end justify-center pb-12">
-                  <h1 className="font-serif text-5xl md:text-6xl text-white font-normal tracking-tight">Understand your hair.<br/>Find your style.</h1>
+            <motion.div key="landing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: -10, filter: 'blur(10px)' }} className="flex flex-col items-center text-center mt-12 space-y-10">
+              <div className="w-full max-w-6xl overflow-hidden aspect-[21/9] relative mb-4 rounded-3xl shadow-elevated">
+                <img src="https://images.unsplash.com/photo-1522337660859-02fbefca4702?w=1200&q=80" className="w-full h-full object-cover grayscale-[10%] hover:scale-105 transition-transform duration-[3000ms]" alt="Hair Studio" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-transparent to-transparent opacity-80" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <h1 className="font-serif text-6xl md:text-8xl text-white font-normal tracking-tight mix-blend-overlay">
+                    Hair Intelligence
+                  </h1>
                 </div>
               </div>
               
-              <p className="max-w-2xl text-lg text-[var(--text-muted)] font-medium">
-                Analyze your hair characteristics, explore care guidance, discover hairstyles, and preview them on yourself.
+              <p className="max-w-2xl text-xl text-[var(--text-muted)] font-light leading-relaxed">
+                A rigorous analysis of your hair's characteristics, paired with personalized style recommendations and high-fidelity virtual try-on.
               </p>
 
-              <div className="flex gap-4 pt-4">
-                <GlassButton variant="primary" onClick={() => setView('capture')} className="px-10 py-4 text-lg">
-                  Analyze My Hair ✦
+              <div className="flex gap-6 pt-4">
+                <GlassButton variant="primary" onClick={() => setView('capture')} className="px-10 py-4 text-base">
+                  Initiate Analysis
                 </GlassButton>
-                <GlassButton variant="secondary" onClick={() => { /* Skip to lookbook if profile exists */ }} className="px-8 py-4 text-lg">
-                  Explore Hairstyles
+                <GlassButton variant="secondary" onClick={() => {}} className="px-10 py-4 text-base">
+                  Explore Lookbook
                 </GlassButton>
               </div>
             </motion.div>
@@ -104,37 +94,38 @@ export default function HairStudioPage() {
 
           {/* 2. GUIDED CAPTURE */}
           {view === 'capture' && (
-            <motion.div key="capture" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="max-w-2xl mx-auto space-y-8">
-              <div className="text-center space-y-2">
-                <h2 className="font-serif text-3xl font-bold">Guided Hair Capture</h2>
-                <p className="text-[var(--text-muted)] text-sm">Follow the prompts to capture 3 angles for accurate analysis.</p>
+            <motion.div key="capture" initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="max-w-2xl mx-auto space-y-12 mt-12">
+              <div className="text-center space-y-4">
+                <h2 className="font-serif text-5xl font-normal">Visual Capture</h2>
+                <p className="text-[var(--text-muted)] text-base">Follow the prompts to capture 3 angles for accurate analysis.</p>
               </div>
 
-              <div className="glass-card rounded-[3rem] p-8 aspect-[3/4] flex flex-col items-center justify-center relative overflow-hidden border border-[var(--text-muted)]">
-                {/* Mock Camera Viewfinder */}
-                <div className="absolute inset-8 border-2 border-dashed border-[var(--text-muted)] rounded-full opacity-30 animate-spin-slow"></div>
-                <div className="absolute inset-0 bg-black/5 z-0"></div>
-                
-                <div className="relative z-10 text-center space-y-6">
-                  <div className="text-6xl mb-4 text-[var(--text-primary)]">📸</div>
-                  <h3 className="font-serif text-2xl font-bold text-[var(--text-primary)]">{captureInstructions[captureStep].title}</h3>
-                  <p className="text-[var(--text-muted)] font-medium">{captureInstructions[captureStep].desc}</p>
+              <div className="glass-deep rounded-[2rem] p-12 aspect-[3/4] flex flex-col items-center justify-center relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-[var(--text-primary)] to-transparent opacity-[0.02] group-hover:opacity-[0.05] transition-opacity duration-1000" />
+                <div className="text-center space-y-8 relative z-10">
+                  <div className="text-xs font-numeric text-[var(--text-muted)] tracking-widest px-4 py-1 glass-soft rounded-full inline-block">
+                    STEP 0{captureStep + 1}
+                  </div>
+                  <h3 className="font-serif text-4xl font-medium text-[var(--text-primary)]">{captureInstructions[captureStep].title}</h3>
+                  <p className="text-[var(--text-muted)] text-lg max-w-sm mx-auto">{captureInstructions[captureStep].desc}</p>
                   
-                  {captureStep < 2 ? (
-                    <GlassButton variant="primary" onClick={() => setCaptureStep(s => s + 1)} className="px-8 mt-8">
-                      Capture
-                    </GlassButton>
-                  ) : (
-                    <GlassButton variant="primary" onClick={runAnalysis} className="px-8 mt-8">
-                      Start Hair Analysis ✦
-                    </GlassButton>
-                  )}
+                  <div className="pt-8">
+                    {captureStep < 2 ? (
+                      <GlassButton variant="primary" onClick={() => setCaptureStep(s => s + 1)} className="px-10 py-4">
+                        Capture Frame
+                      </GlassButton>
+                    ) : (
+                      <GlassButton variant="primary" onClick={runAnalysis} className="px-10 py-4">
+                        Commence Analysis
+                      </GlassButton>
+                    )}
+                  </div>
                 </div>
               </div>
               
-              <div className="flex justify-center gap-2">
+              <div className="flex justify-center gap-4">
                 {[0, 1, 2].map(step => (
-                  <div key={step} className={`h-2 rounded-full transition-all duration-500 ${step <= captureStep ? 'w-8 bg-[var(--text-primary)]' : 'w-2 bg-[var(--text-muted)] opacity-30'}`} />
+                  <div key={step} className={\`h-[2px] transition-all duration-700 \${step <= captureStep ? 'w-16 bg-[var(--text-primary)]' : 'w-8 bg-color-mix(in_srgb,var(--border-color)_50%,transparent)'}\`} />
                 ))}
               </div>
             </motion.div>
@@ -142,97 +133,78 @@ export default function HairStudioPage() {
 
           {/* 3. ANALYZING LOADING STATE */}
           {view === 'analyzing' && (
-            <motion.div key="analyzing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-8">
-              <div className="w-24 h-24 border-4 border-[var(--text-muted)] border-t-[var(--text-primary)] rounded-full animate-spin"></div>
-              <h2 className="font-serif text-4xl font-bold text-[var(--text-primary)]">Reading your hair ✨</h2>
-              <div className="space-y-3 text-left max-w-xs mx-auto text-[var(--text-muted)] font-medium">
-                <p className="flex items-center gap-2"><span>✓</span> Capturing views</p>
-                <p className="flex items-center gap-2"><span>✓</span> Understanding hair type</p>
-                <p className="flex items-center gap-2 animate-pulse text-[var(--text-primary)]"><span>●</span> Building your profile</p>
-                <p className="flex items-center gap-2 opacity-50"><span>○</span> Finding suitable styles</p>
+            <motion.div key="analyzing" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-10">
+              <div className="w-20 h-20 border-[2px] border-transparent border-t-[var(--text-primary)] border-r-[var(--text-primary)] rounded-full animate-spin-slow opacity-80" />
+              <h2 className="font-serif text-4xl font-normal text-[var(--text-primary)]">Evaluating Profile</h2>
+              <div className="space-y-4 text-left max-w-sm mx-auto text-[var(--text-muted)] text-base glass-soft p-8 rounded-3xl">
+                <p className="flex items-center gap-4"><span className="text-xs font-numeric">01</span> Capturing structural data</p>
+                <p className="flex items-center gap-4"><span className="text-xs font-numeric">02</span> Determining texture profile</p>
+                <p className="flex items-center gap-4 text-[var(--text-primary)]"><span className="text-xs font-numeric">03</span> Generating recommendations</p>
               </div>
             </motion.div>
           )}
 
           {/* 4. HAIR PROFILE & CARE */}
           {view === 'profile' && profile && (
-            <motion.div key="profile" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-12">
-              <div className="flex justify-between items-end">
+            <motion.div key="profile" initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="space-y-16 mt-12">
+              <div className="flex justify-between items-end border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-8">
                 <div>
-                  <h1 className="font-serif text-5xl font-bold mb-2">Your Hair Profile</h1>
-                  <p className="text-[var(--text-muted)] font-medium text-lg">Analysis complete. Here is what we found.</p>
+                  <h1 className="font-serif text-6xl font-normal mb-4">Diagnostic Results</h1>
+                  <p className="text-[var(--text-muted)] text-lg">Analysis complete. Below is your structural hair profile.</p>
                 </div>
-                <GlassButton variant="primary" onClick={() => setView('lookbook')} className="px-8 py-3">
-                  View Recommended Hairstyles →
+                <GlassButton variant="primary" onClick={() => setView('lookbook')} className="px-8 py-4">
+                  View Recommendations
                 </GlassButton>
               </div>
 
-              {/* Top Signals */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {[
-                  { label: 'Hair Type', value: profile.hairType },
+                  { label: 'Classification', value: profile.hairType },
                   { label: 'Texture', value: profile.texture },
                   { label: 'Curl Pattern', value: profile.curlPattern },
                   { label: 'Density', value: profile.density }
                 ].map((stat, i) => (
-                  <div key={i} className="glass-card p-6 rounded-[2rem] text-center">
-                    <div className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-2">{stat.label}</div>
-                    <div className="font-serif text-2xl font-bold text-[var(--text-primary)]">{stat.value}</div>
-                  </div>
+                  <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="glass-soft p-8 rounded-3xl relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-[var(--text-primary)] to-transparent opacity-[0.02] group-hover:opacity-[0.05] transition-opacity duration-500" />
+                    <div className="text-xs text-[var(--text-muted)] uppercase tracking-widest mb-4 relative z-10">{stat.label}</div>
+                    <div className="font-serif text-3xl font-normal text-[var(--text-primary)] relative z-10">{stat.value}</div>
+                  </motion.div>
                 ))}
               </div>
 
-              {/* Care Guidance */}
-              <div className="grid md:grid-cols-2 gap-8">
-                <div className="glass-card p-8 rounded-[3rem] space-y-6">
-                  <h2 className="font-serif text-3xl font-bold">What your hair may need</h2>
-                  <div className="space-y-6">
-                    <div className="p-4 rounded-2xl bg-[var(--text-primary)] text-[var(--bg-primary)]">
-                      <div className="font-bold mb-1">Moisture & Definition</div>
-                      <p className="text-sm opacity-90">The analysis indicates a wavy hair pattern with visible mild dryness. Common factors include environment and styling habits.</p>
+              <div className="grid md:grid-cols-2 gap-12 pt-8">
+                <div className="glass-deep rounded-[2rem] p-10 space-y-8">
+                  <h2 className="font-serif text-4xl font-normal">Care Directives</h2>
+                  <div className="space-y-8">
+                    <div className="p-8 bg-[var(--text-primary)] text-[var(--bg-primary)] rounded-2xl">
+                      <div className="font-medium mb-3 text-lg">Moisture & Definition Focus</div>
+                      <p className="text-base opacity-90 leading-relaxed">Analysis indicates a wavy pattern with mild structural dehydration. This requires targeted hydration to maintain elasticity.</p>
                     </div>
                     <div>
-                      <div className="font-bold text-[var(--text-primary)] mb-2">What you can do:</div>
-                      <ul className="space-y-2 text-sm text-[var(--text-muted)]">
-                        <li>• Use lightweight, hydrating conditioner</li>
-                        <li>• Avoid excessive brushing when hair is wet</li>
-                        <li>• Scrunch in a wave-defining product</li>
+                      <div className="font-medium text-[var(--text-primary)] mb-4 text-sm uppercase tracking-widest">Actionable Steps:</div>
+                      <ul className="space-y-4 text-base text-[var(--text-muted)] border-l-2 border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pl-6">
+                        <li>Integrate lightweight, hydrating conditioner</li>
+                        <li>Minimize mechanical stress when wet</li>
+                        <li>Utilize a defining product for structure</li>
                       </ul>
                     </div>
                   </div>
                 </div>
 
-                <div className="glass-card p-8 rounded-[3rem] space-y-6">
-                  <h2 className="font-serif text-3xl font-bold">Things to Be Careful With</h2>
-                  <ul className="space-y-3 text-sm text-[var(--text-muted)]">
-                    <li className="flex gap-3"><span className="text-xl">⚠️</span> Excessive heat styling without protection</li>
-                    <li className="flex gap-3"><span className="text-xl">⚠️</span> Heavy oils that may weigh down waves</li>
-                    <li className="flex gap-3"><span className="text-xl">⚠️</span> Over-washing, which can strip natural moisture</li>
+                <div className="glass-frosted rounded-[2rem] p-10 space-y-8">
+                  <h2 className="font-serif text-4xl font-normal">Risk Factors</h2>
+                  <ul className="space-y-5 text-base text-[var(--text-muted)] border-l-2 border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pl-6">
+                    <li>Excessive thermal styling without protective barriers</li>
+                    <li>Application of heavy occlusives that disrupt wave patterns</li>
+                    <li>Over-cleansing leading to lipid barrier degradation</li>
                   </ul>
                   
-                  <div className="mt-8 pt-6 border-t border-[var(--text-muted)]/20">
-                    <h3 className="font-bold text-sm text-[var(--text-primary)] mb-2">When to Get Professional Advice</h3>
-                    <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                      This AI analysis is not a medical diagnosis. A qualified dermatologist or professional stylist can assess persistent concerns like scalp irritation or unusual shedding.
+                  <div className="mt-12 pt-8 border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">
+                    <h3 className="font-medium text-xs uppercase tracking-widest text-[var(--text-primary)] mb-3">Medical Disclaimer</h3>
+                    <p className="text-sm text-[var(--text-muted)] leading-relaxed">
+                      This assessment is cosmetic in nature. For pathological conditions (e.g., unusual shedding, scalp inflammation), consult a certified dermatologist.
                     </p>
                   </div>
-                </div>
-              </div>
-
-              {/* Curated Product Categories */}
-              <div>
-                <h2 className="font-serif text-3xl font-bold mb-6">Hair Care Recommendations</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {[
-                    { cat: 'Lightweight Conditioner', reason: 'To hydrate without weighing down loose waves.' },
-                    { cat: 'Wave-Defining Mousse', reason: 'Enhances curl pattern and reduces frizz.' },
-                    { cat: 'Clarifying Shampoo', reason: 'Use occasionally to prevent product buildup.' }
-                  ].map((p, i) => (
-                     <div key={i} className="glass-card p-6 rounded-[2rem]">
-                       <div className="font-bold text-[var(--text-primary)] mb-2">{p.cat}</div>
-                       <div className="text-xs text-[var(--text-muted)]">{p.reason}</div>
-                     </div>
-                  ))}
                 </div>
               </div>
             </motion.div>
@@ -240,39 +212,40 @@ export default function HairStudioPage() {
 
           {/* 5. HAIRSTYLE LOOKBOOK */}
           {view === 'lookbook' && (
-             <motion.div key="lookbook" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="space-y-8">
-               <div className="flex justify-between items-center mb-8">
+             <motion.div key="lookbook" initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} exit={{ opacity: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="space-y-16 mt-12">
+               <div className="flex justify-between items-end border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-8">
                  <div>
-                   <h2 className="font-serif text-4xl font-bold text-[var(--text-primary)]">Which Hairstyles Could Suit You?</h2>
-                   <p className="text-[var(--text-muted)] mt-2">Tailored to your {profile?.hairType?.toLowerCase()} hair and style preferences.</p>
+                   <h2 className="font-serif text-5xl font-normal text-[var(--text-primary)]">Recommended Aesthetics</h2>
+                   <p className="text-[var(--text-muted)] mt-4 text-lg">Curated based on your structural profile and indicated preferences.</p>
                  </div>
-                 <button onClick={() => setView('profile')} className="text-sm font-bold text-[var(--text-muted)] hover:text-[var(--text-primary)]">← Back to Profile</button>
+                 <button onClick={() => setView('profile')} className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors underline underline-offset-4">
+                   Return to Diagnostic
+                 </button>
                </div>
 
-               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
                  {recommendedStyles.map((style, idx) => (
-                   <div key={style.id} className="glass-card rounded-[2rem] overflow-hidden group flex flex-col">
-                     <div className="relative aspect-[4/5] overflow-hidden">
-                       <img src={style.imageUrl} alt={style.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                       <div className="absolute top-4 right-4 bg-[var(--bg-primary)]/80 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm flex items-center gap-2">
-                         <span className="font-numeric font-bold text-[var(--text-primary)]">{style.compatibilityScore}</span>
-                         <span className="text-[10px] uppercase font-bold text-[var(--text-muted)]">Match</span>
+                   <motion.div key={style.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1 }} className="group flex flex-col glass-soft rounded-[2rem] overflow-hidden">
+                     <div className="relative aspect-[4/5] overflow-hidden bg-[var(--surface)]">
+                       <img src={style.imageUrl} alt={style.name} className="w-full h-full object-cover grayscale-[10%] transition-transform duration-[2000ms] group-hover:scale-105" />
+                       <div className="absolute top-4 right-4 glass-crystal text-[var(--text-primary)] px-4 py-2 text-xs font-numeric font-medium tracking-widest rounded-full">
+                         {style.compatibilityScore} MATCH
                        </div>
-                       <div className="absolute bottom-4 left-4 bg-[var(--bg-primary)]/80 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold shadow-sm">
+                       <div className="absolute bottom-4 left-4 bg-[var(--text-primary)] text-[var(--bg-primary)] px-4 py-2 text-xs uppercase tracking-widest rounded-full">
                          {style.category}
                        </div>
                      </div>
-                     <div className="p-6 flex-1 flex flex-col">
-                       <h3 className="font-serif text-2xl font-bold text-[var(--text-primary)] mb-2">{style.name}</h3>
-                       <div className="text-xs text-[var(--text-muted)] mb-4 flex gap-2">
-                         <span className="uppercase font-bold tracking-wider">Maint: {style.maintenanceLevel}</span>
+                     <div className="flex-1 flex flex-col p-8">
+                       <h3 className="font-serif text-3xl font-normal text-[var(--text-primary)] mb-3">{style.name}</h3>
+                       <div className="text-xs text-[var(--text-muted)] mb-4 uppercase tracking-widest">
+                         Upkeep: {style.maintenanceLevel}
                        </div>
-                       <p className="text-sm text-[var(--text-muted)] mb-6 flex-1">{style.whyRecommended}</p>
-                       <GlassButton variant="primary" onClick={() => runTryOn(style)} className="w-full py-3">
-                         Try This Hairstyle ✦
+                       <p className="text-base text-[var(--text-muted)] mb-8 flex-1 leading-relaxed">{style.whyRecommended}</p>
+                       <GlassButton variant="primary" onClick={() => runTryOn(style)} className="w-full py-4 text-base">
+                         Virtual Try-On
                        </GlassButton>
                      </div>
-                   </div>
+                   </motion.div>
                  ))}
                </div>
              </motion.div>
@@ -280,61 +253,60 @@ export default function HairStudioPage() {
 
           {/* 6. VIRTUAL TRY ON (VTO) */}
           {view === 'vto' && selectedStyle && (
-            <motion.div key="vto" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="space-y-8 max-w-4xl mx-auto">
-              <div className="flex justify-between items-center">
-                 <h2 className="font-serif text-3xl font-bold">Virtual Try-On</h2>
-                 <button onClick={() => setView('lookbook')} className="text-sm font-bold text-[var(--text-muted)] hover:text-[var(--text-primary)]">✕ Close</button>
+            <motion.div key="vto" initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }} animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }} exit={{ opacity: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="space-y-12 max-w-6xl mx-auto mt-12">
+              <div className="flex justify-between items-end border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-8">
+                 <h2 className="font-serif text-5xl font-normal">Virtual Render</h2>
+                 <button onClick={() => setView('lookbook')} className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors underline underline-offset-4">
+                   Close Render
+                 </button>
               </div>
 
               {vtoResult?.status === 'pending' ? (
-                <div className="glass-card rounded-[3rem] p-12 aspect-[4/3] flex flex-col items-center justify-center text-center space-y-6">
-                  <div className="w-16 h-16 border-4 border-[var(--text-muted)] border-t-[var(--text-primary)] rounded-full animate-spin"></div>
-                  <h3 className="font-serif text-2xl font-bold">Creating your new look...</h3>
-                  <div className="text-[var(--text-muted)] text-sm space-y-2">
-                    <p className="animate-pulse">Applying hairstyle: {selectedStyle.name}</p>
-                    <p>Refining the result</p>
+                <div className="glass-deep rounded-[3rem] p-16 flex flex-col items-center justify-center text-center space-y-10 min-h-[60vh]">
+                  <div className="w-16 h-16 border-[2px] border-transparent border-t-[var(--text-primary)] border-r-[var(--text-primary)] rounded-full animate-spin-slow opacity-80" />
+                  <div>
+                    <h3 className="font-serif text-4xl font-normal mb-4">Generating Synthesis</h3>
+                    <p className="text-[var(--text-muted)] text-lg">Applying <span className="text-[var(--text-primary)]">{selectedStyle.name}</span> architecture...</p>
                   </div>
                 </div>
               ) : (
-                <div className="space-y-8">
-                  {/* Before/After Slider Mock */}
-                  <div className="glass-card rounded-[3rem] p-4 flex gap-4 aspect-[21/9]">
-                    <div className="w-1/2 relative rounded-[2.5rem] overflow-hidden">
-                      <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&q=80" className="w-full h-full object-cover filter grayscale opacity-80" alt="Before" />
-                      <div className="absolute top-4 left-4 glass-pill px-3 py-1 text-xs font-bold shadow-sm">Before</div>
+                <div className="space-y-12">
+                  <div className="flex gap-4">
+                    <div className="w-1/2 relative glass-soft p-2 rounded-[2rem] overflow-hidden">
+                      <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&q=80" className="w-full aspect-[3/4] object-cover grayscale-[30%] rounded-[1.5rem]" alt="Source" />
+                      <div className="absolute top-8 left-8 glass-crystal text-[var(--text-primary)] px-4 py-2 text-xs uppercase tracking-widest rounded-full">Source</div>
                     </div>
-                    <div className="w-1/2 relative rounded-[2.5rem] overflow-hidden shadow-xl border-4 border-white">
-                      <img src={vtoResult?.resultImageUrl} className="w-full h-full object-cover" alt="After" />
-                      <div className="absolute top-4 right-4 bg-white text-black px-3 py-1 rounded-full text-xs font-bold shadow-md">After</div>
-                      <div className="absolute bottom-4 left-0 right-0 text-center">
-                         <span className="glass-pill px-4 py-2 font-serif text-lg shadow-lg backdrop-blur-xl">
+                    <div className="w-1/2 relative glass-deep p-2 rounded-[2rem] overflow-hidden">
+                      <img src={vtoResult?.resultImageUrl} className="w-full aspect-[3/4] object-cover rounded-[1.5rem]" alt="Render" />
+                      <div className="absolute top-8 right-8 bg-[var(--text-primary)] text-[var(--bg-primary)] px-4 py-2 text-xs uppercase tracking-widest rounded-full">Render</div>
+                      <div className="absolute bottom-10 left-0 right-0 text-center">
+                         <span className="glass-crystal text-[var(--text-primary)] px-8 py-4 font-serif text-2xl tracking-wide rounded-full shadow-elevated">
                            {selectedStyle.name}
                          </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Actions & Connection */}
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="glass-card p-6 rounded-[2rem] space-y-4">
-                      <h3 className="font-bold text-[var(--text-primary)]">Change One Thing</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {['Shorter', 'Longer', 'More Volume', 'Different Color'].map(opt => (
-                          <button key={opt} onClick={() => runTryOn(selectedStyle)} className="text-xs px-4 py-2 rounded-full border border-[var(--text-muted)] hover:bg-[var(--text-primary)] hover:text-[var(--bg-primary)] transition-colors">
+                  <div className="grid md:grid-cols-2 gap-12 pt-8">
+                    <div className="glass-soft rounded-[2rem] p-10 space-y-6">
+                      <h3 className="font-medium text-[var(--text-primary)] text-sm uppercase tracking-widest mb-2">Adjust Parameters</h3>
+                      <div className="flex flex-wrap gap-4">
+                        {['Shorter', 'Longer', 'More Volume', 'Tone Shift'].map(opt => (
+                          <button key={opt} onClick={() => runTryOn(selectedStyle)} className="text-sm px-6 py-3 glass-frosted text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all rounded-full hover:shadow-subtle">
                             {opt}
                           </button>
                         ))}
                       </div>
                     </div>
 
-                    <div className="glass-card p-6 rounded-[2rem] flex flex-col justify-center items-center text-center space-y-4 bg-[var(--text-primary)] text-[var(--bg-primary)]">
+                    <div className="glass-deep rounded-[2rem] p-10 flex flex-col justify-center items-start space-y-6">
                       <div>
-                        <h3 className="font-bold mb-1">Love this look?</h3>
-                        <p className="text-xs opacity-80">Take it to Test My Look to see how it pairs with your wardrobe.</p>
+                        <h3 className="font-medium text-sm mb-3 uppercase tracking-widest">Confirm Aesthetic</h3>
+                        <p className="text-base text-[var(--text-muted)] leading-relaxed">Incorporate this hairstyle into your overall ContextMirror profile to evaluate alongside wardrobe selections.</p>
                       </div>
-                      <button onClick={() => router.push('/test-look')} className="w-full bg-[var(--bg-primary)] text-[var(--text-primary)] font-bold py-3 rounded-xl shadow-lg hover:scale-[1.02] transition-transform">
-                        Use This Hairstyle in My Look ✦
-                      </button>
+                      <GlassButton variant="primary" onClick={() => router.push('/test-look')} className="px-8 py-4 text-base">
+                        Proceed to Context Test
+                      </GlassButton>
                     </div>
                   </div>
                 </div>

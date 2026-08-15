@@ -64,11 +64,11 @@ export class MockApparelVTOProvider implements ApparelVTOProvider {
     
     // Curated high quality result mock images matching garment/look categories
     const mockVTOImages: Record<string, string> = {
-      cloth: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&q=80',
-      shoes: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600&q=80',
-      bag: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600&q=80',
-      outerwear: 'https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=600&q=80',
-      default: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80',
+      cloth: 'https://images.unsplash.com/photo-1550614000-4b95d4ed79ea?w=600&q=80',
+      shoes: 'https://images.unsplash.com/photo-1560343090-f0409e92791a?w=600&q=80',
+      bag: 'https://images.unsplash.com/photo-1584916201218-f4242ceb4809?w=600&q=80',
+      outerwear: 'https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=600&q=80',
+      default: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&q=80',
     }
 
     const imageUrl = mockVTOImages[category] || garmentUrl || mockVTOImages.default

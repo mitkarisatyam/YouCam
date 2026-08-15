@@ -10,6 +10,7 @@ import { providers } from '@/lib/providers'
 import type { ShoppingItem, PurchaseDecisionScore } from '@/types'
 import type { VTOResult } from '@/lib/providers/apparel'
 import { useRouter } from 'next/navigation'
+import { ScrollReveal } from '@/components/ui/ScrollReveal'
 
 type ViewState = 'landing' | 'analyzing' | 'decision' | 'vto'
 
@@ -27,7 +28,7 @@ export default function ShoppingAssistantPage() {
     setTimeout(() => {
       // Mock analyzing an uploaded garment
       const item: ShoppingItem = {
-        id: `shop-${Date.now()}`,
+        id: \`shop-\${Date.now()}\`,
         imageUrl: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&q=80',
         category: 'Outerwear',
         color: 'Brown',
@@ -67,107 +68,102 @@ export default function ShoppingAssistantPage() {
   }
 
   return (
-    <div className="min-h-screen pb-24 text-[var(--text-primary)]">
-      {/* Animated Shopping Background */}
-      <div className="fixed inset-0 -z-10 bg-[var(--bg-primary)] overflow-hidden">
-        <div className="absolute top-[20%] left-[-10%] w-[60%] h-[70%] bg-[var(--accent-gold)] rounded-full blur-[150px] opacity-10 animate-pulse-slow"></div>
-        <div className="absolute bottom-[-20%] right-[10%] w-[70%] h-[70%] bg-[#b89f89] rounded-full blur-[120px] opacity-[0.15]"></div>
-      </div>
-      
+    <div className="min-h-screen pb-24 font-ui text-[var(--text-primary)]">
       <GlassNav />
 
-      <main className="max-w-6xl mx-auto px-6 pt-4">
+      <main className="max-w-[85rem] mx-auto px-6 pt-12">
         <AnimatePresence mode="wait">
 
           {/* 1. LANDING SCREEN */}
           {view === 'landing' && (
-            <motion.div key="landing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: -20 }} className="flex flex-col items-center text-center mt-12 space-y-8">
-              <div className="w-full max-w-4xl rounded-[3rem] overflow-hidden aspect-[21/9] relative shadow-2xl mb-8">
-                <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80" className="w-full h-full object-cover" alt="Shopping Assistant" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end justify-center pb-12">
-                  <h1 className="font-serif text-5xl md:text-6xl text-white font-normal tracking-tight">Shop Smarter.<br/>Decide with Confidence.</h1>
+            <motion.div key="landing" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20, filter: 'blur(10px)' }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="flex flex-col items-center text-center mt-4 space-y-12">
+              <div className="w-full max-w-6xl overflow-hidden aspect-[21/9] relative rounded-[3rem] shadow-elevated group">
+                <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200&q=80" className="w-full h-full object-cover grayscale-[20%] group-hover:scale-105 transition-transform duration-[3000ms]" alt="Shopping Assistant" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-[color-mix(in_srgb,var(--bg-primary)_40%,transparent)] to-transparent flex items-end justify-center pb-16">
+                  <h1 className="font-serif text-6xl md:text-8xl text-[var(--text-primary)] font-normal tracking-tight">Purchase Evaluation.</h1>
                 </div>
               </div>
               
-              <p className="max-w-2xl text-lg text-[var(--text-muted)] font-medium">
-                Upload a photo or screenshot of a garment you want to buy. See how it fits your current wardrobe, test it virtually, and get a compatibility score.
+              <p className="max-w-3xl text-xl text-[var(--text-muted)] font-light leading-relaxed">
+                Ingest a reference image of a prospective garment. Evaluate compatibility with existing inventory, visualize via VTO, and generate a definitive acquisition score.
               </p>
 
-              <div className="glass-card p-12 rounded-[3rem] w-full max-w-2xl border-2 border-dashed border-[var(--text-muted)] flex flex-col items-center justify-center space-y-6">
-                <div className="text-5xl">🛍️</div>
-                <div className="space-y-2">
-                  <h3 className="font-bold text-xl">Upload Garment Image</h3>
-                  <p className="text-sm text-[var(--text-muted)]">Drag and drop, or click to browse</p>
+              <div className="glass-deep rounded-[3rem] p-16 w-full max-w-4xl border-[2px] border-dashed border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] hover:border-[var(--text-primary)] transition-all duration-500 flex flex-col items-center justify-center space-y-8 group cursor-pointer relative overflow-hidden" onClick={handleUpload}>
+                <div className="absolute inset-0 bg-gradient-to-t from-transparent via-[var(--text-primary)] to-transparent opacity-[0.02] group-hover:translate-y-full transition-transform duration-[2000ms] ease-in-out" />
+                <div className="text-6xl text-[var(--text-muted)] group-hover:text-[var(--text-primary)] group-hover:-translate-y-2 transition-all duration-500 font-serif font-light relative z-10">↑</div>
+                <div className="space-y-4 relative z-10">
+                  <h3 className="font-medium text-2xl uppercase tracking-widest text-[var(--text-primary)]">Ingest Reference Material</h3>
+                  <p className="text-base text-[var(--text-muted)]">Select or drag image to initialize evaluation.</p>
                 </div>
-                <GlassButton variant="primary" onClick={handleUpload} className="px-10 py-4 text-lg">
-                  Test This Purchase ✦
-                </GlassButton>
               </div>
             </motion.div>
           )}
 
           {/* 2. ANALYZING SCREEN */}
           {view === 'analyzing' && (
-             <motion.div key="analyzing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-8">
-               <div className="w-24 h-24 border-4 border-[var(--text-muted)] border-t-[var(--text-primary)] rounded-full animate-spin"></div>
-               <h2 className="font-serif text-4xl font-bold text-[var(--text-primary)]">Evaluating Garment...</h2>
-               <div className="space-y-3 text-left max-w-xs mx-auto text-[var(--text-muted)] font-medium">
-                 <p className="flex items-center gap-2 text-[var(--text-primary)]"><span>✓</span> Analyzing product category</p>
-                 <p className="flex items-center gap-2 text-[var(--text-primary)]"><span>✓</span> Checking your wardrobe</p>
-                 <p className="flex items-center gap-2 animate-pulse"><span>●</span> Calculating compatibility score</p>
+             <motion.div key="analyzing" initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }} animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }} className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-12 glass-deep rounded-[3rem] p-16 max-w-3xl mx-auto shadow-elevated">
+               <div className="w-20 h-20 border-[2px] border-transparent border-t-[var(--text-primary)] border-r-[var(--text-primary)] rounded-full animate-spin-slow opacity-80" />
+               <h2 className="font-serif text-5xl font-normal text-[var(--text-primary)]">Executing Evaluation</h2>
+               <div className="space-y-6 text-left max-w-sm mx-auto text-[var(--text-muted)] text-sm uppercase tracking-widest font-medium glass-soft p-8 rounded-[2rem] w-full">
+                 <p className="flex items-center justify-between"><span>Categorizing Garment</span> <span className="text-[var(--text-primary)] font-numeric">100%</span></p>
+                 <p className="flex items-center justify-between"><span>Scanning Inventory</span> <span className="text-[var(--text-primary)] font-numeric">100%</span></p>
+                 <p className="flex items-center justify-between text-[var(--text-primary)] animate-pulse"><span>Computing Matrix</span> <span className="font-numeric">Wait...</span></p>
                </div>
              </motion.div>
           )}
 
           {/* 3. DECISION SCREEN */}
           {view === 'decision' && shoppingItem && score && (
-            <motion.div key="decision" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="space-y-8">
-               <div className="flex justify-between items-center">
-                 <h2 className="font-serif text-4xl font-bold">Purchase Decision</h2>
-                 <button onClick={() => setView('landing')} className="text-sm font-bold text-[var(--text-muted)] hover:text-[var(--text-primary)]">← Back to Upload</button>
+            <motion.div key="decision" initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} exit={{ opacity: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="space-y-12 max-w-6xl mx-auto mt-8">
+               <div className="flex justify-between items-center border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-8">
+                 <h2 className="font-serif text-5xl font-normal">Acquisition Matrix</h2>
+                 <button onClick={() => setView('landing')} className="text-sm uppercase tracking-widest font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] underline underline-offset-4 transition-colors">Cancel</button>
                </div>
 
-               <div className="grid md:grid-cols-2 gap-8">
+               <div className="grid md:grid-cols-2 gap-12">
                  {/* Garment Details */}
-                 <div className="glass-card p-6 rounded-[3rem] flex flex-col items-center text-center space-y-6">
-                   <div className="w-full aspect-square rounded-[2rem] overflow-hidden">
-                     <img src={shoppingItem.imageUrl} alt="Garment" className="w-full h-full object-cover" />
+                 <div className="glass-deep p-10 rounded-[3rem] flex flex-col space-y-10 group overflow-hidden">
+                   <div className="w-full aspect-[4/5] rounded-[2rem] overflow-hidden glass-soft p-2">
+                     <img src={shoppingItem.imageUrl} alt="Garment" className="w-full h-full object-cover rounded-[1.5rem] group-hover:scale-[1.03] transition-transform duration-[2000ms]" />
                    </div>
-                   <div>
-                     <h3 className="font-bold text-2xl">{shoppingItem.color} {shoppingItem.category}</h3>
-                     <p className="text-[var(--text-muted)] text-sm uppercase tracking-wider mt-2">{shoppingItem.formality} • {shoppingItem.pattern}</p>
+                   <div className="border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-6">
+                     <h3 className="font-serif text-4xl font-normal mb-3">{shoppingItem.color} {shoppingItem.category}</h3>
+                     <p className="text-[var(--text-muted)] text-sm uppercase tracking-widest font-medium glass-soft px-4 py-2 inline-block rounded-full">{shoppingItem.formality} · {shoppingItem.pattern}</p>
                    </div>
-                   <GlassButton variant="primary" onClick={handleVto} className="w-full py-4 text-lg">
-                     Virtual Try-On ✦
+                   <GlassButton variant="primary" onClick={handleVto} className="w-full py-5 text-base shadow-elevated">
+                     Execute Virtual Try-On
                    </GlassButton>
                  </div>
 
                  {/* Score Breakdown */}
-                 <div className="space-y-6 flex flex-col justify-center">
-                   <div className="glass-card p-8 rounded-[3rem] text-center space-y-4 bg-gradient-to-br from-[var(--bg-primary)] to-[var(--accent-gold)]/10">
-                     <h4 className="text-sm uppercase tracking-wider font-bold text-[var(--text-muted)]">Outfit Compatibility Score</h4>
-                     <div className="font-numeric text-8xl font-bold text-[var(--text-primary)]">{score.totalScore}</div>
-                     <p className="text-[var(--text-muted)] text-sm px-4">{score.explanation}</p>
+                 <div className="space-y-8 flex flex-col justify-center">
+                   <div className="glass-soft p-12 rounded-[3rem] text-center space-y-8 relative overflow-hidden group">
+                     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[var(--text-primary)] to-transparent opacity-[0.02] group-hover:opacity-[0.05] transition-opacity duration-1000" />
+                     <h4 className="text-xs uppercase tracking-widest font-medium text-[var(--text-muted)] relative z-10 glass-crystal px-4 py-2 inline-block rounded-full">Definitive Score</h4>
+                     <div className="font-numeric text-9xl font-light text-[var(--text-primary)] tracking-tighter relative z-10">{score.totalScore}</div>
+                     <p className="text-[var(--text-muted)] text-base leading-relaxed max-w-md mx-auto relative z-10">{score.explanation}</p>
                    </div>
 
-                   <div className="glass-card p-6 rounded-[2rem] space-y-4">
-                     <h4 className="font-bold text-lg mb-4">Breakdown</h4>
-                     {[
-                       { label: 'Wardrobe Compatibility', val: score.wardrobeCompatibilityScore },
-                       { label: 'Occasion Fit', val: score.occasionFitScore },
-                       { label: 'Color Harmony', val: score.colorHarmonyScore },
-                       { label: 'Style Match', val: score.styleMatchScore },
-                     ].map(metric => (
-                       <div key={metric.label} className="space-y-1">
-                         <div className="flex justify-between text-xs font-bold text-[var(--text-muted)]">
-                           <span>{metric.label}</span>
-                           <span>{metric.val}/100</span>
-                         </div>
-                         <div className="h-2 w-full bg-[var(--text-muted)]/20 rounded-full overflow-hidden">
-                           <div className="h-full bg-[var(--text-primary)] rounded-full transition-all duration-1000" style={{ width: `${metric.val}%` }}></div>
-                         </div>
-                       </div>
-                     ))}
+                   <div className="glass-frosted p-12 rounded-[3rem] space-y-10">
+                     <h4 className="font-medium text-sm uppercase tracking-widest border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-4">Metrics Breakdown</h4>
+                     <div className="space-y-8">
+                       {[
+                         { label: 'Inventory Integration', val: score.wardrobeCompatibilityScore },
+                         { label: 'Occasion Viability', val: score.occasionFitScore },
+                         { label: 'Color Theory Harmony', val: score.colorHarmonyScore },
+                         { label: 'Aesthetic Alignment', val: score.styleMatchScore },
+                       ].map((metric, idx) => (
+                         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.1 }} key={metric.label} className="space-y-4">
+                           <div className="flex justify-between text-xs font-medium uppercase tracking-widest text-[var(--text-muted)]">
+                             <span>{metric.label}</span>
+                             <span className="text-[var(--text-primary)] font-numeric">{metric.val}/100</span>
+                           </div>
+                           <div className="h-2 w-full glass-deep rounded-full overflow-hidden">
+                             <motion.div initial={{ width: 0 }} animate={{ width: \`\${metric.val}%\` }} transition={{ duration: 1.5, ease: "easeOut" }} className="h-full bg-[var(--text-primary)]"></motion.div>
+                           </div>
+                         </motion.div>
+                       ))}
+                     </div>
                    </div>
                  </div>
                </div>
@@ -176,35 +172,35 @@ export default function ShoppingAssistantPage() {
 
           {/* 4. VIRTUAL TRY ON SCREEN */}
           {view === 'vto' && shoppingItem && (
-             <motion.div key="vto" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="max-w-4xl mx-auto space-y-8">
-               <div className="flex justify-between items-center">
-                 <h2 className="font-serif text-3xl font-bold">Virtual Try-On</h2>
-                 <button onClick={() => setView('decision')} className="text-sm font-bold text-[var(--text-muted)] hover:text-[var(--text-primary)]">← Back to Score</button>
+             <motion.div key="vto" initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} exit={{ opacity: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="max-w-5xl mx-auto space-y-12 mt-8">
+               <div className="flex justify-between items-center border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-8">
+                 <h2 className="font-serif text-5xl font-normal">Visualization Result</h2>
+                 <button onClick={() => setView('decision')} className="text-sm uppercase tracking-widest font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] underline underline-offset-4 transition-colors">Return</button>
                </div>
 
                {vtoResult?.status === 'pending' ? (
-                 <div className="glass-card rounded-[3rem] p-12 aspect-[4/3] flex flex-col items-center justify-center text-center space-y-6">
-                   <div className="w-16 h-16 border-4 border-[var(--text-muted)] border-t-[var(--text-primary)] rounded-full animate-spin"></div>
-                   <h3 className="font-serif text-2xl font-bold">Creating your look...</h3>
-                   <div className="text-[var(--text-muted)] text-sm space-y-2">
-                     <p className="animate-pulse">Applying garment using YouCam API...</p>
+                 <div className="glass-deep rounded-[3rem] p-24 aspect-[4/3] flex flex-col items-center justify-center text-center space-y-10 shadow-elevated">
+                   <div className="w-20 h-20 border-[2px] border-transparent border-t-[var(--text-primary)] border-r-[var(--text-primary)] rounded-full animate-spin-slow opacity-80" />
+                   <h3 className="font-serif text-4xl font-normal">Processing Virtual Model</h3>
+                   <div className="text-[var(--text-muted)] text-sm uppercase tracking-widest font-medium glass-soft px-6 py-3 rounded-full">
+                     <p className="animate-pulse">Interfacing with Visualization API</p>
                    </div>
                  </div>
                ) : (
-                 <div className="glass-card rounded-[3rem] p-4 flex flex-col items-center relative overflow-hidden bg-black aspect-[3/4]">
+                 <div className="glass-soft p-4 rounded-[3rem] flex flex-col items-center relative overflow-hidden shadow-elevated aspect-[4/5] max-w-3xl mx-auto">
                    <img src={vtoResult?.resultImageUrl} className="w-full h-full object-cover rounded-[2.5rem]" alt="Try On Result" />
-                   <div className="absolute top-6 left-6 flex gap-2">
-                     <div className="glass-pill bg-white/90 text-black px-4 py-2 font-bold text-sm shadow-xl">
-                       Virtual Result
+                   <div className="absolute top-12 left-12">
+                     <div className="glass-crystal text-[var(--text-primary)] px-6 py-3 text-xs uppercase tracking-widest font-medium rounded-full shadow-subtle">
+                       VTO Output
                      </div>
                    </div>
-                   <div className="absolute bottom-6 left-6 right-6 flex justify-between items-center glass-pill px-6 py-4 shadow-2xl backdrop-blur-xl">
-                     <div className="text-left">
-                       <h4 className="font-bold text-lg">{shoppingItem.color} {shoppingItem.category}</h4>
-                       <p className="text-xs opacity-80">Fits great with your current wardrobe!</p>
+                   <div className="absolute bottom-12 left-12 right-12 flex justify-between items-center glass-crystal p-8 rounded-[2rem] shadow-elevated backdrop-blur-xl">
+                     <div className="text-left text-[var(--text-primary)]">
+                       <h4 className="font-serif text-3xl font-normal mb-2">{shoppingItem.color} {shoppingItem.category}</h4>
+                       <p className="text-[10px] uppercase tracking-widest opacity-80 font-medium">Verified Context Integration</p>
                      </div>
-                     <button onClick={() => router.push('/test-look')} className="bg-[var(--text-primary)] text-[var(--bg-primary)] px-6 py-2 rounded-full font-bold text-sm hover:scale-105 transition-transform">
-                       Take to Test My Look →
+                     <button onClick={() => router.push('/test-look')} className="bg-[var(--text-primary)] text-[var(--bg-primary)] px-10 py-5 text-sm uppercase tracking-widest font-medium transition-transform hover:scale-105 rounded-full shadow-subtle">
+                       Proceed to Evaluation
                      </button>
                    </div>
                  </div>

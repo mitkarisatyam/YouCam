@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { AnimatedBackground } from '@/components/ui/AnimatedBackground'
+import { CinematicAtmosphere } from '@/components/ui/CinematicAtmosphere'
+import { FloatingAtmosphere } from '@/components/ui/FloatingAtmosphere'
+import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher'
 import { PageTransition } from '@/components/ui/PageTransition'
 
 export const metadata: Metadata = {
@@ -15,7 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Manrope:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
         <script
@@ -39,7 +41,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="antialiased selection:bg-[#191919] selection:text-white relative min-h-screen overflow-x-hidden">
         {/* Living Animated Background System */}
-        <AnimatedBackground />
+        <CinematicAtmosphere />
+        <FloatingAtmosphere />
 
         {/* Page Content & Motion Transitions */}
         <PageTransition>

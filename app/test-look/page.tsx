@@ -182,36 +182,34 @@ function TestLookContent() {
   }
 
   return (
-    <div className="min-h-screen pb-24">
-      <div className="fixed inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,var(--bg-primary),transparent_50%),radial-gradient(ellipse_at_bottom_left,var(--accent-glow),transparent_50%)] opacity-30 animate-pulse-slow"></div>
+    <div className="min-h-screen pb-24 font-ui text-[var(--text-primary)]">
       <GlassNav />
 
-      <main className="max-w-5xl mx-auto px-6 pt-2 space-y-10">
+      <main className="max-w-[85rem] mx-auto px-6 pt-12 space-y-16">
         {/* ═══ PROGRESS NAV ═════════════════════════════════════════ */}
-        <div className="glass-level-1 p-2.5 rounded-full flex flex-wrap justify-between items-center gap-1 overflow-x-auto hide-scrollbar">
+        <div className="glass-crystal rounded-full p-2 flex flex-wrap justify-between items-center gap-2 overflow-x-auto hide-scrollbar sticky top-24 z-30 shadow-elevated backdrop-blur-xl">
           {STEP_LABELS.map(st => (
             <button
               key={st.s}
               onClick={() => {
                 if (st.s <= step || candidates.length > 0) setStep(st.s as any)
               }}
-              className={`relative px-4 py-2 rounded-full text-xs font-medium transition-all duration-300 whitespace-nowrap ${
+              className={\`relative px-8 py-3 text-xs tracking-widest uppercase font-medium transition-all duration-500 whitespace-nowrap rounded-full \${
                 step === st.s
-                  ? 'text-[var(--bg-primary)] font-bold shadow-md'
+                  ? 'text-[var(--bg-primary)] shadow-md'
                   : st.s < step
-                  ? 'text-[var(--text-primary)] opacity-70'
-                  : 'text-[var(--text-muted)] opacity-40'
-              }`}
+                  ? 'text-[var(--text-primary)] opacity-80 hover:opacity-100'
+                  : 'text-[var(--text-muted)] opacity-50'
+              }\`}
             >
               {step === st.s && (
                 <motion.div
                   layoutId="stepPill"
-                  className="absolute inset-0 bg-[var(--text-primary)] rounded-full -z-10"
+                  className="absolute inset-0 bg-[var(--text-primary)] -z-10 rounded-full"
                   transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 />
               )}
-              <span className="flex items-center gap-1.5">
-                <span>{st.icon}</span>
+              <span className="flex items-center gap-2">
                 <span className="hidden sm:inline">{st.name}</span>
               </span>
             </button>
@@ -223,168 +221,174 @@ function TestLookContent() {
           {step === 1 && (
             <motion.div
               key="step1"
-              initial={{ opacity: 0, y: 20, filter: 'blur(4px)' }}
+              initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -15, filter: 'blur(4px)' }}
-              transition={{ duration: 0.5 }}
-              className="space-y-10"
+              exit={{ opacity: 0, y: -20, filter: 'blur(10px)' }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="space-y-16"
             >
-              <div className="text-center max-w-2xl mx-auto space-y-3">
-                <h1 className="font-serif text-4xl lg:text-5xl text-[var(--text-primary)] font-normal">
-                  What are you getting ready for?
+              <div className="text-center max-w-4xl mx-auto space-y-6 pt-8">
+                <span className="glass-crystal px-4 py-2 rounded-full text-xs font-medium uppercase tracking-widest inline-block shadow-subtle text-[var(--text-primary)]">Context Initialization</span>
+                <h1 className="font-serif text-6xl lg:text-8xl text-[var(--text-primary)] font-normal tracking-tight">
+                  Define the Environment.
                 </h1>
-                <p className="text-[var(--text-muted)] text-sm leading-relaxed">
-                  Tell us about the moment. We'll build your look around it.
+                <p className="text-[var(--text-muted)] text-xl font-light tracking-wide max-w-2xl mx-auto leading-relaxed">
+                  Establish the spatial, temporal, and atmospheric parameters for your aesthetic synthesis.
                 </p>
               </div>
 
               {/* Natural Language Input */}
-              <div className="glass-level-3 p-8 rounded-[2rem] space-y-6 relative overflow-hidden">
-                <label className="block text-xl font-serif font-bold text-[var(--text-primary)] text-center">
-                  Tell us about the moment...
+              <div className="glass-deep rounded-[3rem] p-16 space-y-10 relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--text-primary)] to-transparent opacity-[0.02] group-hover:opacity-[0.04] transition-opacity duration-1000" />
+                <label className="block text-sm uppercase tracking-widest font-medium text-[var(--text-muted)] text-center relative z-10">
+                  Semantic Input
                 </label>
-                <div className="flex flex-col sm:flex-row gap-4 max-w-3xl mx-auto">
+                <div className="flex flex-col sm:flex-row gap-6 max-w-5xl mx-auto relative z-10">
                   <input
                     type="text"
                     value={naturalInput}
                     onChange={e => setNaturalInput(e.target.value)}
-                    placeholder="e.g. Wedding at 7 PM in an indoor hotel. I want something elegant."
-                    className={`flex-1 px-6 py-5 rounded-2xl glass-pill text-lg focus:outline-none focus:ring-2 focus:ring-[var(--accent-gold)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)]/50 transition-all ${parsing ? 'blur-sm opacity-50 scale-95' : ''}`}
+                    placeholder="e.g. Corporate event at 7 PM in an indoor hotel."
+                    className={\`flex-1 px-8 py-5 rounded-[2rem] glass-soft bg-[color-mix(in_srgb,var(--bg-primary)_50%,transparent)] text-base focus:outline-none focus:ring-2 focus:ring-[var(--text-primary)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-all \${parsing ? 'opacity-50 scale-95 filter blur-sm' : ''}\`}
                   />
-                  <GlassButton variant="primary" onClick={handleParseNatural} className={`transition-all ${parsing ? 'scale-95' : ''}`}>
-                    {parsing ? 'Understanding context...' : 'Build My Context ✦'}
+                  <GlassButton variant="primary" onClick={handleParseNatural} className={\`px-12 py-5 text-base transition-all rounded-[2rem] shadow-elevated \${parsing ? 'scale-95 opacity-80' : ''}\`}>
+                    {parsing ? 'Processing...' : 'Execute Context'}
                   </GlassButton>
                 </div>
                 
                 {parsing && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-[var(--bg-primary)]/40 backdrop-blur-sm z-10 rounded-[2rem]">
-                     <div className="flex flex-col items-center gap-2">
-                       <span className="animate-spin text-3xl">✦</span>
-                       <span className="text-xs font-mono tracking-widest uppercase">Understanding occasion & style</span>
+                  <div className="absolute inset-0 flex items-center justify-center glass-frosted z-20 rounded-[3rem]">
+                     <div className="flex flex-col items-center gap-6">
+                       <span className="animate-spin-slow text-5xl font-serif text-[var(--text-primary)]">✦</span>
+                       <span className="text-sm font-medium tracking-widest uppercase text-[var(--text-muted)]">Parsing Semantics</span>
                      </div>
                   </div>
                 )}
 
                 {/* Parsed Context Chips */}
                 {!parsing && context.rawNaturalInput && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-wrap justify-center gap-3 pt-4">
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap justify-center gap-4 pt-10 border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] relative z-10">
                     {[
-                      { icon: '🎯', value: context.occasion },
-                      { icon: '🕒', value: context.time },
-                      { icon: '📍', value: context.environment },
-                      { icon: '🎩', value: context.formality },
-                      { icon: '☁️', value: context.weather },
-                      { icon: '✨', value: context.mood },
-                    ].filter(s => s.value).map(s => (
-                      <span key={s.icon} className="glass-liquid px-4 py-2 rounded-full text-sm font-bold text-[var(--text-primary)] capitalize shadow-sm">
-                        {s.icon} {s.value}
-                      </span>
+                      { icon: 'Target', value: context.occasion },
+                      { icon: 'Time', value: context.time },
+                      { icon: 'Location', value: context.environment },
+                      { icon: 'Formality', value: context.formality },
+                      { icon: 'Weather', value: context.weather },
+                      { icon: 'Style', value: context.mood },
+                    ].filter(s => s.value).map((s, i) => (
+                      <motion.span initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }} key={s.icon} className="px-6 py-3 glass-crystal rounded-full text-xs font-medium text-[var(--text-primary)] uppercase tracking-widest shadow-subtle">
+                        <span className="opacity-50 mr-2">{s.icon}:</span> {s.value}
+                      </motion.span>
                     ))}
                   </motion.div>
                 )}
               </div>
 
-              {/* Occasion Grid */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider pl-2">Or select an occasion</h3>
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                  {OCCASION_TILES.map((tile) => (
-                    <button
-                      key={tile.id}
-                      onClick={() => {
-                        const updated = { ...context, occasion: tile.id }
-                        setContextState(updated)
-                        saveContext(updated)
-                      }}
-                      className={`p-4 rounded-2xl flex flex-col items-center gap-2 transition-all ${
-                        context.occasion === tile.id
-                          ? 'glass-level-3 ring-2 ring-[var(--text-primary)] shadow-lg'
-                          : 'glass-pill hover:bg-white/5'
-                      }`}
-                    >
-                      <span className="text-2xl">{tile.icon}</span>
-                      <span className="text-[10px] font-bold text-[var(--text-primary)] text-center">{tile.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               {/* Manual Options */}
-              <div className="glass-card p-6 rounded-[2rem] grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
-                <div>
-                  <label className="block text-xs font-bold text-[var(--text-muted)] mb-2 uppercase">Time</label>
-                  <select value={context.time} onChange={e => setContextState({...context, time: e.target.value as any})} className="w-full p-2.5 rounded-xl glass-pill focus:outline-none">
-                    <option value="morning">Morning</option>
-                    <option value="afternoon">Afternoon</option>
-                    <option value="evening">Evening</option>
-                    <option value="night">Night</option>
-                  </select>
+              <div className="space-y-8 glass-soft p-12 rounded-[3rem]">
+                <h3 className="text-sm font-medium text-[var(--text-muted)] uppercase tracking-widest border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-4">Parameter Manual Override</h3>
+                
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--text-muted)] mb-4 uppercase tracking-widest">Time</label>
+                    <select value={context.time} onChange={e => setContextState({...context, time: e.target.value as any})} className="w-full p-5 rounded-2xl glass-frosted focus:outline-none focus:ring-2 focus:ring-[var(--text-primary)] text-sm uppercase tracking-wider appearance-none cursor-pointer">
+                      <option value="morning">Morning</option>
+                      <option value="afternoon">Afternoon</option>
+                      <option value="evening">Evening</option>
+                      <option value="night">Night</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--text-muted)] mb-4 uppercase tracking-widest">Environment</label>
+                    <select value={context.environment} onChange={e => setContextState({...context, environment: e.target.value as any})} className="w-full p-5 rounded-2xl glass-frosted focus:outline-none focus:ring-2 focus:ring-[var(--text-primary)] text-sm uppercase tracking-wider appearance-none cursor-pointer">
+                      <option value="indoor">Indoor</option>
+                      <option value="outdoor">Outdoor</option>
+                      <option value="office">Office</option>
+                      <option value="hotel">Hotel</option>
+                      <option value="restaurant">Restaurant</option>
+                      <option value="beach">Beach</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--text-muted)] mb-4 uppercase tracking-widest">Formality</label>
+                    <select value={context.formality} onChange={e => setContextState({...context, formality: e.target.value as any})} className="w-full p-5 rounded-2xl glass-frosted focus:outline-none focus:ring-2 focus:ring-[var(--text-primary)] text-sm uppercase tracking-wider appearance-none cursor-pointer">
+                      <option value="casual">Casual</option>
+                      <option value="smart-casual">Smart Casual</option>
+                      <option value="formal">Formal</option>
+                      <option value="traditional">Traditional</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--text-muted)] mb-4 uppercase tracking-widest">Weather</label>
+                    <select value={context.weather || ''} onChange={e => setContextState({...context, weather: e.target.value as any})} className="w-full p-5 rounded-2xl glass-frosted focus:outline-none focus:ring-2 focus:ring-[var(--text-primary)] text-sm uppercase tracking-wider appearance-none cursor-pointer">
+                      <option value="">Any / Unknown</option>
+                      <option value="hot">Hot</option>
+                      <option value="warm">Warm</option>
+                      <option value="mild">Mild</option>
+                      <option value="cool">Cool</option>
+                      <option value="cold">Cold</option>
+                      <option value="rainy">Rainy</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--text-muted)] mb-4 uppercase tracking-widest">Style Vector</label>
+                    <select value={context.mood || ''} onChange={e => setContextState({...context, mood: e.target.value as any})} className="w-full p-5 rounded-2xl glass-frosted focus:outline-none focus:ring-2 focus:ring-[var(--text-primary)] text-sm uppercase tracking-wider appearance-none cursor-pointer">
+                      <option value="">Any</option>
+                      <option value="minimal">Minimal</option>
+                      <option value="elegant">Elegant</option>
+                      <option value="bold">Bold</option>
+                      <option value="classic">Classic</option>
+                      <option value="relaxed">Relaxed</option>
+                      <option value="trendy">Trendy</option>
+                    </select>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-[var(--text-muted)] mb-2 uppercase">Environment</label>
-                  <select value={context.environment} onChange={e => setContextState({...context, environment: e.target.value as any})} className="w-full p-2.5 rounded-xl glass-pill focus:outline-none">
-                    <option value="indoor">Indoor</option>
-                    <option value="outdoor">Outdoor</option>
-                    <option value="office">Office</option>
-                    <option value="hotel">Hotel</option>
-                    <option value="restaurant">Restaurant</option>
-                    <option value="beach">Beach</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-[var(--text-muted)] mb-2 uppercase">Formality</label>
-                  <select value={context.formality} onChange={e => setContextState({...context, formality: e.target.value as any})} className="w-full p-2.5 rounded-xl glass-pill focus:outline-none">
-                    <option value="casual">Casual</option>
-                    <option value="smart-casual">Smart Casual</option>
-                    <option value="formal">Formal</option>
-                    <option value="traditional">Traditional</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-[var(--text-muted)] mb-2 uppercase">Weather</label>
-                  <select value={context.weather || ''} onChange={e => setContextState({...context, weather: e.target.value as any})} className="w-full p-2.5 rounded-xl glass-pill focus:outline-none">
-                    <option value="">Any / Unknown</option>
-                    <option value="hot">Hot</option>
-                    <option value="warm">Warm</option>
-                    <option value="mild">Mild</option>
-                    <option value="cool">Cool</option>
-                    <option value="cold">Cold</option>
-                    <option value="rainy">Rainy</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-[var(--text-muted)] mb-2 uppercase">Mood / Style</label>
-                  <select value={context.mood || ''} onChange={e => setContextState({...context, mood: e.target.value as any})} className="w-full p-2.5 rounded-xl glass-pill focus:outline-none">
-                    <option value="">Any</option>
-                    <option value="minimal">Minimal</option>
-                    <option value="elegant">Elegant</option>
-                    <option value="bold">Bold</option>
-                    <option value="classic">Classic</option>
-                    <option value="relaxed">Relaxed</option>
-                    <option value="trendy">Trendy</option>
-                  </select>
+
+                {/* Occasion Grid */}
+                <div className="pt-8 border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] space-y-6">
+                  <label className="block text-xs font-medium text-[var(--text-muted)] uppercase tracking-widest">Preset Contexts</label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    {OCCASION_TILES.map((tile) => (
+                      <button
+                        key={tile.id}
+                        onClick={() => {
+                          const updated = { ...context, occasion: tile.id }
+                          setContextState(updated)
+                          saveContext(updated)
+                        }}
+                        className={\`p-4 rounded-[1.5rem] text-center transition-all duration-300 \${
+                          context.occasion === tile.id
+                            ? 'bg-[var(--text-primary)] text-[var(--bg-primary)] shadow-elevated scale-105'
+                            : 'glass-frosted text-[var(--text-primary)] hover:bg-[color-mix(in_srgb,var(--text-primary)_10%,transparent)] hover:scale-105'
+                        }\`}
+                      >
+                        <span className="text-xs font-medium uppercase tracking-widest block">{tile.label}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
               {/* Context Result Card */}
               {context.rawNaturalInput && !parsing && (
-                <div className="flex justify-center pt-4">
-                  <div className="glass-level-3 p-8 rounded-[2rem] text-center max-w-sm w-full shadow-2xl border border-[var(--border-color)]">
-                    <h3 className="font-serif text-2xl font-normal text-[var(--text-primary)] mb-6 border-b border-[var(--border-color)] pb-4">Your Moment</h3>
-                    <div className="space-y-4 text-lg">
-                      <div className="capitalize">🎯 {context.occasion}</div>
-                      <div className="capitalize">🕒 {context.time}</div>
-                      <div className="capitalize">📍 {context.environment}</div>
-                      <div className="capitalize">🎩 {context.formality}</div>
-                      {context.mood && <div className="capitalize">✨ {context.mood}</div>}
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-center pt-8">
+                  <div className="glass-deep p-12 rounded-[3rem] text-center w-full max-w-2xl shadow-elevated relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-t from-[var(--text-primary)] to-transparent opacity-[0.02] group-hover:opacity-[0.05] transition-opacity duration-1000" />
+                    <h3 className="font-serif text-4xl font-normal text-[var(--text-primary)] mb-8 border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-6 relative z-10">Active Parameters</h3>
+                    <div className="space-y-6 text-sm font-medium uppercase tracking-widest text-[var(--text-muted)] relative z-10">
+                      <div className="flex justify-between items-center bg-[color-mix(in_srgb,var(--surface)_50%,transparent)] p-4 rounded-xl"><span>Occasion</span> <span className="text-[var(--text-primary)] text-base">{context.occasion}</span></div>
+                      <div className="flex justify-between items-center bg-[color-mix(in_srgb,var(--surface)_50%,transparent)] p-4 rounded-xl"><span>Time</span> <span className="text-[var(--text-primary)] text-base">{context.time}</span></div>
+                      <div className="flex justify-between items-center bg-[color-mix(in_srgb,var(--surface)_50%,transparent)] p-4 rounded-xl"><span>Environment</span> <span className="text-[var(--text-primary)] text-base">{context.environment}</span></div>
+                      <div className="flex justify-between items-center bg-[color-mix(in_srgb,var(--surface)_50%,transparent)] p-4 rounded-xl"><span>Formality</span> <span className="text-[var(--text-primary)] text-base">{context.formality}</span></div>
+                      {context.mood && <div className="flex justify-between items-center bg-[color-mix(in_srgb,var(--surface)_50%,transparent)] p-4 rounded-xl"><span>Style</span> <span className="text-[var(--text-primary)] text-base">{context.mood}</span></div>}
                     </div>
                   </div>
-                </div>
+                </motion.div>
               )}
 
-              <div className="flex justify-end pt-8">
-                <GlassButton variant="primary" onClick={() => setStep(2)}>
-                  Continue to Personal Profile →
+              <div className="flex justify-end pt-12 border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">
+                <GlassButton variant="primary" onClick={() => setStep(2)} className="px-10 py-5 text-base shadow-elevated">
+                  Proceed to Subject Profile
                 </GlassButton>
               </div>
             </motion.div>
@@ -394,94 +398,99 @@ function TestLookContent() {
           {step === 2 && (
             <motion.div
               key="step2"
-              initial={{ opacity: 0, y: 20, filter: 'blur(4px)' }}
+              initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -15, filter: 'blur(4px)' }}
-              transition={{ duration: 0.5 }}
-              className="space-y-10"
+              exit={{ opacity: 0, y: -20, filter: 'blur(10px)' }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="space-y-16"
             >
-              <div className="text-center max-w-2xl mx-auto space-y-3">
-                <h1 className="font-serif text-4xl lg:text-5xl text-[var(--text-primary)] font-normal">
-                  Make it personal.
+              <div className="text-center max-w-4xl mx-auto space-y-6 pt-8">
+                <span className="glass-crystal px-4 py-2 rounded-full text-xs font-medium uppercase tracking-widest inline-block shadow-subtle text-[var(--text-primary)]">Subject Analysis</span>
+                <h1 className="font-serif text-6xl lg:text-8xl text-[var(--text-primary)] font-normal tracking-tight">
+                  Personalize Parameters.
                 </h1>
-                <p className="text-[var(--text-muted)] text-sm">
-                  Add your photo so we can personalize the experience with accurate skin and color analysis.
+                <p className="text-[var(--text-muted)] text-xl font-light tracking-wide max-w-2xl mx-auto leading-relaxed">
+                  Ingest subject imagery for objective skin and aesthetic evaluation.
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <div className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+                <div className="space-y-10 glass-deep p-12 rounded-[3rem] shadow-subtle group">
+                  <div className="border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-6">
+                     <h2 className="font-serif text-4xl font-normal text-[var(--text-primary)]">Image Acquisition</h2>
+                  </div>
                   <UploadZone
-                    label="Add Your Photo"
-                    sublabel="Upload Photo or Take Photo"
+                    label="Provide Subject Image"
+                    sublabel="Upload or Capture Reference Material"
                     currentPreview={selfiePreview}
                     loading={analyzingSkin}
                     onFileSelect={(file) => setSelfiePreview(URL.createObjectURL(file))}
                   />
                   
-                  <div className="glass-pill p-4 rounded-2xl text-xs text-[var(--text-muted)] flex items-start gap-2">
-                    <span className="text-lg">ℹ️</span>
-                    <p>For best results, use a photo with clear face visibility, good lighting, and only one person.</p>
+                  <div className="glass-soft p-6 rounded-2xl text-[10px] font-medium text-[var(--text-muted)] uppercase tracking-widest flex items-start gap-4">
+                    <span className="text-xl text-[var(--text-primary)]">ℹ</span>
+                    <p className="leading-relaxed mt-0.5">Optimal precision requires clear facial exposure, uniform illumination, and a singular subject.</p>
                   </div>
 
                   <GlassButton 
                     variant="primary" 
                     onClick={handleAnalyzeProfile} 
                     disabled={!selfiePreview || analyzingSkin} 
-                    className="w-full py-4 text-lg"
+                    className="w-full py-5 text-base shadow-elevated"
                   >
-                    {analyzingSkin ? 'Analyzing Profile...' : 'Analyze My Profile ✦'}
+                    {analyzingSkin ? 'Processing...' : 'Execute Analysis'}
                   </GlassButton>
                 </div>
 
-                <div className="glass-card p-8 rounded-[2rem] flex flex-col justify-center">
+                <div className="glass-soft p-12 rounded-[3rem] flex flex-col justify-center relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-transparent via-[var(--text-primary)] to-transparent opacity-[0.02]" />
                   {!hasActualProfile ? (
-                    <div className="text-center space-y-4 opacity-50">
-                      <div className="text-4xl">🔍</div>
-                      <p className="text-sm font-medium">Your personal analysis will appear here after you upload a photo.</p>
+                    <div className="text-center space-y-8 opacity-50 relative z-10">
+                      <div className="text-6xl text-[var(--text-primary)] font-serif animate-pulse">✦</div>
+                      <p className="text-sm font-medium uppercase tracking-widest text-[var(--text-muted)] leading-relaxed max-w-xs mx-auto">Awaiting subject imagery for biometric evaluation.</p>
                     </div>
                   ) : (
-                    <div className="space-y-6">
-                      <h3 className="font-serif text-2xl font-bold text-[var(--text-primary)] border-b border-[var(--border-color)] pb-3">
-                        Your Skin Profile
+                    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-10 relative z-10">
+                      <h3 className="font-serif text-4xl font-normal text-[var(--text-primary)] border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-6">
+                        Diagnostic Output
                       </h3>
                       
-                      <div className="space-y-4 text-sm">
-                        <div className="flex justify-between items-center glass-pill p-4 rounded-xl">
-                          <span className="text-[var(--text-muted)] font-bold">Undertone</span>
-                          <span className="font-bold text-[var(--text-primary)] capitalize">{profile.skinSignals.undertone}</span>
+                      <div className="space-y-6 text-sm">
+                        <div className="flex justify-between items-center glass-frosted p-6 rounded-2xl hover:scale-[1.02] transition-transform">
+                          <span className="text-xs uppercase tracking-widest text-[var(--text-muted)] font-medium">Chromatic Base</span>
+                          <span className="text-base font-medium text-[var(--text-primary)] capitalize tracking-wide">{profile.skinSignals.undertone}</span>
                         </div>
-                        <div className="flex justify-between items-center glass-pill p-4 rounded-xl">
-                          <span className="text-[var(--text-muted)] font-bold">Hydration Level</span>
-                          <span className="font-bold text-[var(--text-primary)] capitalize">{profile.skinSignals.hydrationLevel}</span>
+                        <div className="flex justify-between items-center glass-frosted p-6 rounded-2xl hover:scale-[1.02] transition-transform">
+                          <span className="text-xs uppercase tracking-widest text-[var(--text-muted)] font-medium">Moisture Index</span>
+                          <span className="text-base font-medium text-[var(--text-primary)] capitalize tracking-wide">{profile.skinSignals.hydrationLevel}</span>
                         </div>
-                        <div className="flex justify-between items-center glass-pill p-4 rounded-xl">
-                          <span className="text-[var(--text-muted)] font-bold">Clarity Signal</span>
-                          <span className="font-numeric font-bold text-[var(--text-primary)]">{profile.skinSignals.clarityScore} / 100</span>
+                        <div className="flex justify-between items-center glass-frosted p-6 rounded-2xl hover:scale-[1.02] transition-transform">
+                          <span className="text-xs uppercase tracking-widest text-[var(--text-muted)] font-medium">Clarity Metric</span>
+                          <span className="font-numeric font-light text-4xl text-[var(--text-primary)] tracking-tighter">{profile.skinSignals.clarityScore} <span className="text-sm text-[var(--text-muted)]">/ 100</span></span>
                         </div>
                       </div>
 
-                      <div className="pt-4 space-y-2">
-                        <h4 className="text-xs font-bold text-[var(--text-muted)] uppercase">Recommended Palettes</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {profile.colorSignals.recommendedPalettes.map(p => (
-                            <span key={p} className="glass-liquid px-3.5 py-1.5 rounded-full text-xs font-bold">
+                      <div className="pt-8 space-y-6 border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">
+                        <h4 className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-widest">Aesthetic Prescriptions</h4>
+                        <div className="flex flex-wrap gap-4">
+                          {profile.colorSignals.recommendedPalettes.map((p, i) => (
+                            <motion.span initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} key={p} className="glass-crystal px-5 py-3 rounded-full text-[10px] uppercase tracking-widest font-medium text-[var(--text-primary)] shadow-subtle">
                               {p}
-                            </span>
+                            </motion.span>
                           ))}
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   )}
                 </div>
               </div>
 
-              <div className="flex justify-between pt-8">
-                <GlassButton variant="secondary" onClick={() => setStep(1)}>
-                  ← Back to Context
+              <div className="flex justify-between pt-12 border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">
+                <GlassButton variant="secondary" onClick={() => setStep(1)} className="px-8 py-4 text-sm uppercase tracking-widest">
+                  Return to Context
                 </GlassButton>
-                <GlassButton variant="primary" onClick={() => setStep(3)}>
-                  Continue to Generate Looks →
+                <GlassButton variant="primary" onClick={() => setStep(3)} className="px-10 py-5 text-base uppercase tracking-widest shadow-elevated">
+                  Proceed to Synthesis
                 </GlassButton>
               </div>
             </motion.div>
@@ -491,74 +500,79 @@ function TestLookContent() {
           {step === 3 && (
             <motion.div
               key="step3"
-              initial={{ opacity: 0, y: 20, filter: 'blur(4px)' }}
+              initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -15, filter: 'blur(4px)' }}
-              transition={{ duration: 0.5 }}
-              className="space-y-10"
+              exit={{ opacity: 0, y: -20, filter: 'blur(10px)' }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="space-y-16"
             >
-              <div className="text-center max-w-2xl mx-auto space-y-3">
-                <h1 className="font-serif text-4xl lg:text-5xl text-[var(--text-primary)] font-normal">
-                  What could you wear?
+              <div className="text-center max-w-4xl mx-auto space-y-6 pt-8">
+                <span className="glass-crystal px-4 py-2 rounded-full text-xs font-medium uppercase tracking-widest inline-block shadow-subtle text-[var(--text-primary)]">Aesthetic Synthesis</span>
+                <h1 className="font-serif text-6xl lg:text-8xl text-[var(--text-primary)] font-normal tracking-tight">
+                  Configuration Candidates.
                 </h1>
-                <p className="text-[var(--text-muted)] text-sm">
-                  Built for your moment, your wardrobe, and your preferences.
+                <p className="text-[var(--text-muted)] text-xl font-light tracking-wide max-w-2xl mx-auto leading-relaxed">
+                  Algorithmic curation based on established parameters and biometric profiling.
                 </p>
               </div>
 
               {candidates.length === 0 ? (
-                <div className="glass-level-3 p-12 text-center max-w-xl mx-auto rounded-[2rem] space-y-7 relative overflow-hidden">
-                  <div className="text-5xl relative z-10">👗 👔 👠</div>
-                  <h3 className="font-serif text-2xl font-normal text-[var(--text-primary)] mb-2">Ready to curate your looks</h3>
-                  <GlassButton variant="primary" onClick={() => generateLooks(4)} disabled={generatingVTO} className="w-full py-4 text-sm relative z-10">
-                    {generatingVTO ? 'Generating looks...' : 'Generate 4 Candidate Looks ✦'}
+                <div className="glass-deep rounded-[3rem] p-24 text-center max-w-3xl mx-auto shadow-elevated space-y-12 relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,var(--text-primary)_0%,transparent_70%)] opacity-[0.03] group-hover:opacity-[0.06] transition-opacity duration-1000" />
+                  <div className="text-6xl font-serif text-[var(--text-primary)] relative z-10 animate-pulse">✦</div>
+                  <h3 className="font-serif text-4xl font-normal text-[var(--text-primary)] mb-4 relative z-10">Initialize Generation Sequence</h3>
+                  <GlassButton variant="primary" onClick={() => generateLooks(4)} disabled={generatingVTO} className="w-full py-5 text-base relative z-10 shadow-elevated">
+                    {generatingVTO ? 'Synthesizing...' : 'Execute Synthesis'}
                   </GlassButton>
                 </div>
               ) : (
-                <div className="space-y-8">
-                  <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-16">
+                  <div className="grid md:grid-cols-2 gap-10">
                     {candidates.map((candidate, idx) => (
-                      <div key={candidate.id} className="glass-card p-0 rounded-[2rem] overflow-hidden flex flex-col sm:flex-row group shadow-xl">
-                        <div className="sm:w-2/5 aspect-[3/4] relative">
+                      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.1 }} key={candidate.id} className="glass-soft rounded-[2.5rem] p-4 flex flex-col sm:flex-row group transition-all duration-500 hover:shadow-elevated hover:bg-[color-mix(in_srgb,var(--surface)_80%,transparent)]">
+                        <div className="sm:w-2/5 aspect-[3/4] relative rounded-[2rem] overflow-hidden">
                           <img
                             src={candidate.vtoResultUrl}
                             alt={candidate.name}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover grayscale-[10%] group-hover:scale-[1.03] transition-transform duration-[2000ms]"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent sm:bg-gradient-to-r" />
                         </div>
-                        <div className="p-6 flex-1 flex flex-col justify-center space-y-4">
+                        <div className="p-8 flex-1 flex flex-col justify-center space-y-8">
                           <div>
-                            <h3 className="font-serif text-xl font-bold text-[var(--text-primary)]">{candidate.name}</h3>
-                            <div className="text-[10px] uppercase font-mono tracking-widest text-[var(--accent-gold)] mt-1">{candidate.tag}</div>
+                            <h3 className="font-serif text-3xl font-normal text-[var(--text-primary)]">{candidate.name}</h3>
+                            <div className="text-[10px] uppercase tracking-widest font-medium text-[var(--text-muted)] mt-3 glass-crystal px-3 py-1 inline-block rounded-full">Class: {candidate.tag}</div>
                           </div>
-                          <p className="text-sm text-[var(--text-muted)] leading-relaxed">{candidate.explanation}</p>
-                          <div className="pt-4 flex gap-4 text-xs font-bold text-[var(--text-primary)]">
-                            <span className="glass-pill px-3 py-1.5 rounded-lg border border-[var(--border-color)]">
-                              Profile Match: {hasActualProfile ? candidate.stressTest?.profileCompatibility : 'Available after analysis'}
+                          <div className="glass-frosted p-6 rounded-2xl relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--text-primary)] to-transparent opacity-[0.02]" />
+                            <p className="text-sm text-[var(--text-muted)] leading-relaxed relative z-10">{candidate.explanation}</p>
+                          </div>
+                          <div className="pt-2">
+                            <span className="text-xs font-medium uppercase tracking-widest text-[var(--text-primary)] glass-crystal px-5 py-3 rounded-full shadow-subtle flex justify-between items-center">
+                              <span>Biometric Compatibility</span>
+                              <span className="font-numeric text-lg">{hasActualProfile ? candidate.stressTest?.profileCompatibility : 'Pending'}</span>
                             </span>
                           </div>
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
 
-                  <div className="flex justify-center pt-4">
+                  <div className="flex justify-center pt-10 border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">
                     {candidates.length < 6 && (
-                      <GlassButton variant="secondary" onClick={() => generateLooks(6)} disabled={generatingMore}>
-                        {generatingMore ? 'Generating...' : 'Generate 2 More ✦'}
+                      <GlassButton variant="secondary" onClick={() => generateLooks(6)} disabled={generatingMore} className="px-10 py-4 text-sm uppercase tracking-widest rounded-full">
+                        {generatingMore ? 'Processing...' : 'Expand Candidates'}
                       </GlassButton>
                     )}
                   </div>
                 </div>
               )}
 
-              <div className="flex justify-between pt-8">
-                <GlassButton variant="secondary" onClick={() => setStep(2)}>
-                  ← Back to Profile
+              <div className="flex justify-between pt-12 border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">
+                <GlassButton variant="secondary" onClick={() => setStep(2)} className="px-8 py-4 text-sm uppercase tracking-widest">
+                  Return to Profile
                 </GlassButton>
-                <GlassButton variant="primary" onClick={() => setStep(4)} disabled={candidates.length === 0}>
-                  Continue to Stress Test →
+                <GlassButton variant="primary" onClick={() => setStep(4)} disabled={candidates.length === 0} className="px-10 py-5 text-base uppercase tracking-widest shadow-elevated">
+                  Proceed to Evaluation
                 </GlassButton>
               </div>
             </motion.div>
@@ -568,59 +582,63 @@ function TestLookContent() {
           {step === 4 && candidates.length > 0 && (
             <motion.div
               key="step4"
-              initial={{ opacity: 0, y: 20, filter: 'blur(4px)' }}
+              initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -15, filter: 'blur(4px)' }}
-              transition={{ duration: 0.5 }}
-              className="space-y-10"
+              exit={{ opacity: 0, y: -20, filter: 'blur(10px)' }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="space-y-16"
             >
-              <div className="text-center max-w-2xl mx-auto space-y-3">
-                <h1 className="font-serif text-4xl lg:text-5xl text-[var(--text-primary)] font-normal">
-                  Stress-Test Your Look
+              <div className="text-center max-w-4xl mx-auto space-y-6 pt-8">
+                <span className="glass-crystal px-4 py-2 rounded-full text-xs font-medium uppercase tracking-widest inline-block shadow-subtle text-[var(--text-primary)]">Context Simulation</span>
+                <h1 className="font-serif text-6xl lg:text-8xl text-[var(--text-primary)] font-normal tracking-tight">
+                  Stress-Test Execution.
                 </h1>
-                <p className="text-[var(--text-muted)] text-sm">
-                  See how your chosen looks perform in the real situations that matter. <br/> 
-                  <span className="italic opacity-70">AI Context Evaluation scores looks based on real-world constraints.</span>
+                <p className="text-[var(--text-muted)] text-xl font-light tracking-wide max-w-2xl mx-auto leading-relaxed">
+                  Evaluating algorithmic viability across real-world environmental and social parameters.
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                 {candidates.map((candidate, idx) => (
-                  <div key={candidate.id} className="glass-card p-6 rounded-[2rem] space-y-5 text-sm flex flex-col shadow-lg hover:-translate-y-2 transition-transform cursor-pointer" onClick={() => { setSelectedCandidate(candidate); setStep(5); }}>
-                    <div className="aspect-square rounded-xl overflow-hidden relative">
-                      <img src={candidate.vtoResultUrl} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                      <div className="absolute bottom-3 left-3 text-white font-bold font-serif text-lg">{candidate.name}</div>
+                  <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: idx * 0.1 }} key={candidate.id} className="glass-deep p-4 rounded-[2.5rem] space-y-6 flex flex-col group cursor-pointer transition-all duration-500 hover:shadow-elevated hover:-translate-y-2" onClick={() => { setSelectedCandidate(candidate); setStep(5); }}>
+                    <div className="aspect-[3/4] relative rounded-[2rem] overflow-hidden">
+                      <img src={candidate.vtoResultUrl} className="w-full h-full object-cover grayscale-[10%] transition-transform duration-[2000ms] group-hover:scale-[1.05]" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-transparent to-transparent opacity-90" />
+                      <div className="absolute bottom-6 left-6 right-6">
+                        <div className="text-[var(--text-primary)] font-serif text-3xl font-normal leading-tight">{candidate.name}</div>
+                      </div>
                     </div>
                     
-                    <div className="space-y-3 flex-1 border-b border-[var(--border-color)] pb-4">
+                    <div className="space-y-5 flex-1 px-4 pb-4">
                       {[
                         { label: 'Occasion Fit', val: candidate.stressTest?.occasionFit },
                         { label: 'Context Stability', val: candidate.stabilityScore },
-                        { label: 'Profile Compatibility', val: hasActualProfile ? candidate.stressTest?.profileCompatibility : 'N/A' },
+                        { label: 'Profile Viability', val: hasActualProfile ? candidate.stressTest?.profileCompatibility : 'N/A' },
                         { label: 'Style Match', val: candidate.stressTest?.stylePreference },
                       ].map(row => (
-                        <div key={row.label} className="flex justify-between items-center">
-                          <span className="text-[var(--text-muted)] font-medium text-xs">{row.label}</span>
-                          <span className="font-numeric font-bold text-[var(--text-primary)]">{row.val !== 'N/A' ? `${row.val}` : '--'}</span>
+                        <div key={row.label} className="flex justify-between items-center text-xs uppercase tracking-widest font-medium">
+                          <span className="text-[var(--text-muted)]">{row.label}</span>
+                          <span className="font-numeric text-sm text-[var(--text-primary)] bg-[color-mix(in_srgb,var(--surface)_50%,transparent)] px-2 py-1 rounded">{row.val !== 'N/A' ? \`\${row.val}\` : '--'}</span>
                         </div>
                       ))}
+                      
+                      <div className="flex justify-between items-center pt-6 mt-4 border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">
+                        <span className="text-xs uppercase tracking-widest font-medium text-[var(--text-primary)]">Definitive Score</span>
+                        <div className="glass-crystal rounded-full p-2 shadow-subtle bg-white/5">
+                          <ScoreRing score={candidate.contextMirrorScore || 0} size={60} />
+                        </div>
+                      </div>
                     </div>
-
-                    <div className="flex justify-between items-center pt-2">
-                      <span className="font-bold text-[var(--text-primary)] text-lg">Overall</span>
-                      <ScoreRing score={candidate.contextMirrorScore || 0} size={50} />
-                    </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
 
-              <div className="flex justify-between pt-8">
-                <GlassButton variant="secondary" onClick={() => setStep(3)}>
-                  ← Back to Generated Looks
+              <div className="flex justify-between pt-12 border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">
+                <GlassButton variant="secondary" onClick={() => setStep(3)} className="px-8 py-4 text-sm uppercase tracking-widest">
+                  Return to Synthesis
                 </GlassButton>
-                <GlassButton variant="primary" onClick={() => setStep(5)}>
-                  Compare Results →
+                <GlassButton variant="primary" onClick={() => setStep(5)} className="px-10 py-5 text-base uppercase tracking-widest shadow-elevated">
+                  Proceed to Comparison
                 </GlassButton>
               </div>
             </motion.div>
@@ -630,73 +648,76 @@ function TestLookContent() {
           {step === 5 && candidates.length > 0 && (
             <motion.div
               key="step5"
-              initial={{ opacity: 0, y: 20, filter: 'blur(4px)' }}
+              initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -15, filter: 'blur(4px)' }}
-              transition={{ duration: 0.5 }}
-              className="space-y-12"
+              exit={{ opacity: 0, y: -20, filter: 'blur(10px)' }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="space-y-16"
             >
-               <div className="text-center max-w-2xl mx-auto space-y-3">
-                <h1 className="font-serif text-4xl lg:text-5xl text-[var(--text-primary)] font-normal">
-                  Which look works best?
+               <div className="text-center max-w-4xl mx-auto space-y-6 pt-8">
+                <span className="glass-crystal px-4 py-2 rounded-full text-xs font-medium uppercase tracking-widest inline-block shadow-subtle text-[var(--text-primary)]">Aesthetic Comparison</span>
+                <h1 className="font-serif text-6xl lg:text-8xl text-[var(--text-primary)] font-normal tracking-tight">
+                  Editorial Review.
                 </h1>
-                <p className="text-[var(--text-muted)] text-sm">
-                  Fashion editorial comparison of all generated candidates.
+                <p className="text-[var(--text-muted)] text-xl font-light tracking-wide max-w-2xl mx-auto leading-relaxed">
+                  Analyze performance metrics to identify optimal configurations.
                 </p>
               </div>
 
-              <div className="space-y-8 max-w-4xl mx-auto">
-                {candidates.map(candidate => (
-                  <div key={candidate.id} className={`glass-level-2 rounded-[2rem] p-6 flex flex-col md:flex-row gap-8 items-center ${candidate.isBestMatch ? 'ring-2 ring-[var(--accent-gold)] shadow-[0_0_40px_rgba(212,175,55,0.15)]' : ''}`}>
-                    <div className="w-full md:w-1/3 aspect-[3/4] rounded-xl overflow-hidden shadow-lg relative">
-                      <img src={candidate.vtoResultUrl} className="w-full h-full object-cover" />
+              <div className="space-y-10 max-w-6xl mx-auto">
+                {candidates.map((candidate, idx) => (
+                  <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.1 }} key={candidate.id} className={\`glass-deep p-6 rounded-[3rem] flex flex-col md:flex-row gap-12 items-center transition-all duration-500 hover:shadow-elevated group \${candidate.isBestMatch ? 'ring-2 ring-[var(--text-primary)] ring-offset-4 ring-offset-[var(--bg-primary)]' : ''}\`}>
+                    <div className="w-full md:w-1/3 aspect-[3/4] relative rounded-[2rem] overflow-hidden glass-soft p-2">
+                      <img src={candidate.vtoResultUrl} className="w-full h-full object-cover rounded-[1.5rem] grayscale-[10%] group-hover:scale-[1.03] transition-transform duration-[2000ms]" />
                       {candidate.isBestMatch && (
-                        <div className="absolute top-4 left-4 bg-[var(--text-primary)] text-[var(--bg-primary)] px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest shadow-xl font-mono">
-                          Best Match
+                        <div className="absolute top-8 left-8 bg-[var(--text-primary)] text-[var(--bg-primary)] px-6 py-3 text-xs font-medium uppercase tracking-widest rounded-full shadow-elevated">
+                          Algorithmic Optimum
                         </div>
                       )}
                     </div>
 
-                    <div className="flex-1 space-y-6">
-                      <div className="flex justify-between items-start border-b border-[var(--border-color)] pb-4">
+                    <div className="flex-1 space-y-10 py-6 pr-6">
+                      <div className="flex justify-between items-start border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-8">
                         <div>
-                          <h3 className="font-serif text-3xl font-bold text-[var(--text-primary)]">{candidate.name}</h3>
-                          <p className="text-sm text-[var(--text-muted)] mt-2">{candidate.explanation}</p>
+                          <h3 className="font-serif text-5xl font-normal text-[var(--text-primary)] leading-tight">{candidate.name}</h3>
+                          <p className="text-base text-[var(--text-muted)] mt-4 leading-relaxed max-w-xl">{candidate.explanation}</p>
                         </div>
-                        <div className="text-4xl font-numeric font-bold text-[var(--text-primary)]">
+                        <div className="text-8xl font-numeric font-light text-[var(--text-primary)] tracking-tighter">
                           {candidate.contextMirrorScore}
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div className="glass-pill p-4 rounded-xl border border-green-500/20 bg-green-500/5">
-                          <span className="block font-bold text-green-500 mb-1">Strongest Point</span>
-                          <span className="text-[var(--text-primary)]">
-                            {candidate.stressTest?.occasionFit && candidate.stressTest.occasionFit > 85 ? `Excellent ${context.occasion} fit` : 'Overall Versatility'}
+                      <div className="grid grid-cols-2 gap-8 text-sm">
+                        <div className="glass-soft p-8 rounded-[2rem] relative overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-br from-transparent via-[var(--text-primary)] to-transparent opacity-[0.02]" />
+                          <span className="block text-[10px] font-medium uppercase tracking-widest text-[var(--text-primary)] mb-3 relative z-10 glass-crystal px-3 py-1 inline-block rounded-full">Primary Advantage</span>
+                          <span className="text-[var(--text-muted)] text-base relative z-10 block mt-2">
+                            {candidate.stressTest?.occasionFit && candidate.stressTest.occasionFit > 85 ? \`Excellent \${context.occasion} fit\` : 'Overall Versatility'}
                           </span>
                         </div>
-                        <div className="glass-pill p-4 rounded-xl border border-red-500/20 bg-red-500/5">
-                          <span className="block font-bold text-red-500 mb-1">Weakness</span>
-                          <span className="text-[var(--text-primary)]">
-                            {candidate.stressTest?.environmentFit && candidate.stressTest.environmentFit < 80 ? `Not ideal for ${context.environment}` : 'Less versatile'}
+                        <div className="glass-frosted p-8 rounded-[2rem] relative overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-tl from-transparent via-[var(--text-primary)] to-transparent opacity-[0.02]" />
+                          <span className="block text-[10px] font-medium uppercase tracking-widest text-[var(--text-primary)] mb-3 relative z-10 glass-crystal px-3 py-1 inline-block rounded-full">Identified Compromise</span>
+                          <span className="text-[var(--text-muted)] text-base relative z-10 block mt-2">
+                            {candidate.stressTest?.environmentFit && candidate.stressTest.environmentFit < 80 ? \`Not ideal for \${context.environment}\` : 'Less versatile'}
                           </span>
                         </div>
                       </div>
 
-                      <GlassButton variant="primary" className="w-full" onClick={() => { setSelectedCandidate(candidate); setStep(6); }}>
-                        Experiment with this look ✦
+                      <GlassButton variant="primary" className="w-full py-5 text-sm uppercase tracking-widest shadow-elevated" onClick={() => { setSelectedCandidate(candidate); setStep(6); }}>
+                        Execute Sub-Component Alteration
                       </GlassButton>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
 
-              <div className="flex justify-between pt-8">
-                <GlassButton variant="secondary" onClick={() => setStep(4)}>
-                  ← Back to Stress Test
+              <div className="flex justify-between pt-12 border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">
+                <GlassButton variant="secondary" onClick={() => setStep(4)} className="px-8 py-4 text-sm uppercase tracking-widest">
+                  Return to Simulation
                 </GlassButton>
-                <GlassButton variant="primary" onClick={() => { setSelectedCandidate(candidates.find(c => c.isBestMatch) || candidates[0]); setStep(7); }}>
-                  Skip to Final Decision →
+                <GlassButton variant="primary" onClick={() => { setSelectedCandidate(candidates.find(c => c.isBestMatch) || candidates[0]); setStep(7); }} className="px-10 py-5 text-base uppercase tracking-widest shadow-elevated">
+                  Bypass to Final Selection
                 </GlassButton>
               </div>
             </motion.div>
@@ -706,84 +727,85 @@ function TestLookContent() {
           {step === 6 && selectedCandidate && (
              <motion.div
               key="step6"
-              initial={{ opacity: 0, y: 20, filter: 'blur(4px)' }}
+              initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -15, filter: 'blur(4px)' }}
-              transition={{ duration: 0.5 }}
-              className="space-y-12"
+              exit={{ opacity: 0, y: -20, filter: 'blur(10px)' }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="space-y-16"
             >
-              <div className="text-center max-w-2xl mx-auto space-y-3">
-                <h1 className="font-serif text-4xl lg:text-5xl text-[var(--text-primary)] font-normal">
-                  Change One Thing
+              <div className="text-center max-w-4xl mx-auto space-y-6 pt-8">
+                <span className="glass-crystal px-4 py-2 rounded-full text-xs font-medium uppercase tracking-widest inline-block shadow-subtle text-[var(--text-primary)]">Micro-Adjustments</span>
+                <h1 className="font-serif text-6xl lg:text-8xl text-[var(--text-primary)] font-normal tracking-tight">
+                  Component Isolation.
                 </h1>
-                <p className="text-[var(--text-muted)] text-sm">
-                  Fine-tune your choice. What would you like to change?
+                <p className="text-[var(--text-muted)] text-xl font-light tracking-wide max-w-2xl mx-auto leading-relaxed">
+                  Modify individual elements to observe cascading aesthetic effects.
                 </p>
               </div>
 
-              <div className="glass-level-3 p-8 rounded-[2rem] max-w-4xl mx-auto space-y-8">
-                <div className="grid md:grid-cols-2 gap-6">
+              <div className="glass-deep p-16 rounded-[3rem] max-w-5xl mx-auto space-y-12 shadow-elevated">
+                <div className="grid md:grid-cols-2 gap-10">
                   <div>
-                    <label className="block text-xs font-bold text-[var(--text-muted)] mb-2 uppercase">Select Item to Change</label>
-                    <select value={changeItem} onChange={e => setChangeItem(e.target.value)} className="w-full p-4 rounded-xl glass-pill focus:outline-none text-lg">
-                      <option value="jacket">🧥 Jacket / Outerwear</option>
-                      <option value="top">👕 Top</option>
-                      <option value="bottom">👖 Bottom</option>
-                      <option value="shoes">👟 Shoes</option>
-                      <option value="color">🎨 Color Palette</option>
-                      <option value="custom">✍️ Custom Change</option>
+                    <label className="block text-xs font-medium text-[var(--text-muted)] mb-4 uppercase tracking-widest">Target Sub-Component</label>
+                    <select value={changeItem} onChange={e => setChangeItem(e.target.value)} className="w-full p-5 rounded-2xl glass-soft focus:outline-none focus:ring-2 focus:ring-[var(--text-primary)] text-base uppercase tracking-wider text-[var(--text-primary)] appearance-none cursor-pointer">
+                      <option value="jacket">Outerwear Module</option>
+                      <option value="top">Base Layer (Top)</option>
+                      <option value="bottom">Base Layer (Bottom)</option>
+                      <option value="shoes">Footwear Module</option>
+                      <option value="color">Chromatic Palette</option>
+                      <option value="custom">Custom Variable</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-[var(--text-muted)] mb-2 uppercase">What do you want instead?</label>
+                    <label className="block text-xs font-medium text-[var(--text-muted)] mb-4 uppercase tracking-widest">Proposed Replacement</label>
                     <input 
                       type="text" 
                       value={changeValue} 
                       onChange={e => setChangeValue(e.target.value)}
                       placeholder="e.g. Navy blazer, Black boots..."
-                      className="w-full p-4 rounded-xl glass-pill focus:outline-none focus:ring-2 focus:ring-[var(--accent-gold)] text-lg"
+                      className="w-full p-5 rounded-2xl glass-soft focus:outline-none focus:ring-2 focus:ring-[var(--text-primary)] text-base uppercase tracking-wider text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
                     />
                   </div>
                 </div>
 
-                <div className="flex justify-center">
-                   <GlassButton variant="primary" onClick={handleRunExperiment} disabled={!changeValue} className="px-12">
-                     Apply Change ✦
+                <div className="flex justify-center pt-8 border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">
+                   <GlassButton variant="primary" onClick={handleRunExperiment} disabled={!changeValue} className="px-16 py-5 text-base shadow-elevated">
+                     Execute Substitution
                    </GlassButton>
                 </div>
               </div>
 
               {experiment && (
                 <ScrollReveal>
-                  <div className="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto items-center pt-8">
-                    <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl border border-[var(--border-color)]">
+                  <div className="grid md:grid-cols-2 gap-16 max-w-6xl mx-auto items-center pt-12">
+                    <div className="aspect-[3/4] glass-soft p-4 rounded-[3rem] shadow-elevated">
                       <BeforeAfterSlider
                         beforeImage={selectedCandidate.vtoResultUrl || ''}
                         afterImage="https://images.unsplash.com/photo-1594938298603-c8148c4b4e5b?w=600&q=80" // Mock image for now
-                        beforeLabel={`BEFORE (${experiment.beforeScore})`}
-                        afterLabel={`AFTER (${experiment.afterScore})`}
+                        beforeLabel={\`PREVIOUS (\${experiment.beforeScore})\`}
+                        afterLabel={\`REVISED (\${experiment.afterScore})\`}
                       />
                     </div>
                     
-                    <div className="space-y-6">
-                      <h3 className="font-serif text-3xl font-bold text-[var(--text-primary)]">Experiment Result</h3>
+                    <div className="space-y-10">
+                      <h3 className="font-serif text-5xl font-normal text-[var(--text-primary)] border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-6">Substitution Analysis</h3>
                       
-                      <div className={`p-8 rounded-[2rem] border shadow-lg ${experiment.scoreDelta >= 0 ? 'bg-emerald-50/10 border-emerald-500/30' : 'bg-red-50/10 border-red-500/30'}`}>
-                        <span className="text-xs font-mono uppercase tracking-widest block mb-2 opacity-70">Score Delta</span>
-                        <div className="flex items-end gap-2 mb-4">
-                          <span className={`text-5xl font-numeric font-bold ${experiment.scoreDelta >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+                      <div className={\`p-12 rounded-[2.5rem] \${experiment.scoreDelta >= 0 ? 'glass-deep ring-2 ring-[var(--text-primary)] ring-offset-4 ring-offset-[var(--bg-primary)]' : 'glass-frosted'}\`}>
+                        <span className="glass-crystal px-4 py-2 rounded-full text-xs font-medium uppercase tracking-widest inline-block mb-6 text-[var(--text-muted)]">Net Viability Shift</span>
+                        <div className="flex items-end gap-4 mb-8">
+                          <span className={\`text-8xl font-numeric font-light tracking-tighter \${experiment.scoreDelta >= 0 ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}\`}>
                             {experiment.scoreDelta > 0 ? '+' : ''}{experiment.scoreDelta}
                           </span>
-                          <span className="text-xl mb-1 opacity-70">Points</span>
+                          <span className="text-sm uppercase tracking-widest text-[var(--text-muted)] mb-3">Points</span>
                         </div>
-                        <p className="text-[var(--text-primary)] leading-relaxed text-lg border-t border-[var(--border-color)] pt-4">
+                        <p className="text-[var(--text-muted)] leading-relaxed text-base border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pt-8">
                           {experiment.explanation}
                         </p>
                       </div>
 
-                      <div className="pt-4">
-                        <GlassButton variant="primary" className="w-full" onClick={() => setStep(7)}>
-                          Proceed to Final Decision →
+                      <div className="pt-8">
+                        <GlassButton variant="primary" className="w-full py-5 text-sm uppercase tracking-widest shadow-elevated" onClick={() => setStep(7)}>
+                          Proceed to Finalization
                         </GlassButton>
                       </div>
                     </div>
@@ -791,12 +813,12 @@ function TestLookContent() {
                 </ScrollReveal>
               )}
 
-              <div className="flex justify-between pt-8">
-                <GlassButton variant="secondary" onClick={() => setStep(5)}>
-                  ← Back to Comparison
+              <div className="flex justify-between pt-12 border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">
+                <GlassButton variant="secondary" onClick={() => setStep(5)} className="px-8 py-4 text-sm uppercase tracking-widest">
+                  Return to Editorial Review
                 </GlassButton>
-                <GlassButton variant="primary" onClick={() => setStep(7)}>
-                  Skip to Final Decision →
+                <GlassButton variant="primary" onClick={() => setStep(7)} className="px-10 py-5 text-base uppercase tracking-widest shadow-elevated">
+                  Bypass to Final Selection
                 </GlassButton>
               </div>
             </motion.div>
@@ -806,79 +828,81 @@ function TestLookContent() {
           {step === 7 && selectedCandidate && (
              <motion.div
               key="step7"
-              initial={{ opacity: 0, y: 20, filter: 'blur(4px)' }}
+              initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -15, filter: 'blur(4px)' }}
-              transition={{ duration: 0.5 }}
-              className="space-y-12 max-w-3xl mx-auto"
+              exit={{ opacity: 0, y: -20, filter: 'blur(10px)' }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="space-y-16 max-w-5xl mx-auto"
             >
-               <div className="text-center space-y-3">
-                <h1 className="font-serif text-4xl lg:text-5xl text-[var(--text-primary)] font-normal">
-                  Final Decision
+               <div className="text-center space-y-6 pt-8">
+                <span className="glass-crystal px-4 py-2 rounded-full text-xs font-medium uppercase tracking-widest inline-block shadow-subtle text-[var(--text-primary)]">Definitive Output</span>
+                <h1 className="font-serif text-6xl lg:text-8xl text-[var(--text-primary)] font-normal tracking-tight">
+                  Final Selection.
                 </h1>
-                <p className="text-[var(--text-muted)] text-sm">
-                  Log your choice to build your personal style pattern.
+                <p className="text-[var(--text-muted)] text-xl font-light tracking-wide max-w-2xl mx-auto leading-relaxed">
+                  Commit configuration to personal stylistic telemetry.
                 </p>
               </div>
 
-              <div className="glass-level-3 p-8 rounded-[2rem] space-y-8 shadow-xl">
+              <div className="glass-deep p-16 rounded-[3rem] space-y-12 shadow-elevated">
                 <div>
-                  <label className="block text-sm font-bold text-[var(--text-muted)] mb-4 uppercase tracking-widest font-mono text-center">
-                    What did you decide to wear?
+                  <label className="block text-sm font-medium text-[var(--text-muted)] mb-8 uppercase tracking-widest text-center">
+                    Confirm Chosen Configuration
                   </label>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-8">
                     {candidates.slice(0, 4).map(c => (
                       <button
                         key={c.id}
                         onClick={() => setUserChoice(c.id)}
-                        className={`p-4 rounded-[1.25rem] border text-left transition-all ${
+                        className={\`p-8 rounded-[2rem] text-left transition-all duration-300 relative overflow-hidden group \${
                           userChoice === c.id
-                            ? 'border-[var(--accent-gold)] bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold shadow-lg scale-[1.02]'
-                            : 'border-[var(--border-color)] hover:border-[var(--accent-gold)]/50 glass-pill text-[var(--text-primary)]'
-                        }`}
+                            ? 'bg-[var(--text-primary)] text-[var(--bg-primary)] shadow-elevated scale-105'
+                            : 'glass-soft text-[var(--text-primary)] hover:bg-[color-mix(in_srgb,var(--text-primary)_10%,transparent)] hover:scale-[1.02]'
+                        }\`}
                       >
-                        <div className="font-bold mb-1 text-sm">{c.name}</div>
-                        <div className="font-numeric text-xs opacity-80">Score: {c.contextMirrorScore}</div>
-                        {c.isBestMatch && <div className="text-[10px] mt-2 uppercase tracking-widest text-[var(--accent-gold)]">AI Recommended</div>}
+                        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white to-transparent opacity-[0.05]" />
+                        <div className="font-serif text-3xl mb-4 relative z-10">{c.name}</div>
+                        <div className="text-xs uppercase tracking-widest opacity-80 relative z-10">Viability: <span className="font-numeric">{c.contextMirrorScore}</span></div>
+                        {c.isBestMatch && <div className={\`text-[10px] mt-6 uppercase tracking-widest font-medium inline-block px-3 py-1 rounded-full relative z-10 \${userChoice === c.id ? 'bg-[var(--bg-primary)] text-[var(--text-primary)] opacity-90' : 'glass-crystal text-[var(--text-primary)]'}\`}>Algorithmic Optimum</div>}
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <div className="border-t border-[var(--border-color)] pt-6">
-                  <label className="block text-sm font-bold text-[var(--text-muted)] mb-4 uppercase tracking-widest font-mono text-center">
-                    Feedback for your Style Diary
+                <div className="border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pt-10">
+                  <label className="block text-sm font-medium text-[var(--text-muted)] mb-8 uppercase tracking-widest text-center">
+                    Post-Execution Feedback
                   </label>
                   <select
                     value={userFeedback}
                     onChange={e => setUserFeedback(e.target.value as any)}
-                    className="w-full p-4 border border-[var(--border-color)] rounded-[1.25rem] text-lg glass-pill text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-gold)] text-center font-serif"
+                    className="w-full max-w-md mx-auto block p-5 rounded-full glass-frosted text-base uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-[var(--text-primary)] text-[var(--text-primary)] text-center appearance-none cursor-pointer"
                   >
-                    <option value="liked-it">I liked this look for the situation</option>
-                    <option value="i-wore-this">I definitely wore this to the event</option>
-                    <option value="would-change">I would change an item next time</option>
-                    <option value="not-useful">This wasn't useful</option>
+                    <option value="liked-it">Configuration Validated</option>
+                    <option value="i-wore-this">Configuration Deployed</option>
+                    <option value="would-change">Sub-optimal Validation</option>
+                    <option value="not-useful">Configuration Rejected</option>
                   </select>
                 </div>
 
-                <div className="pt-6 flex justify-center">
-                  <GlassButton variant="primary" onClick={handleSaveDecision} className="px-12 py-4 text-lg">
-                    {replaySaved ? '✓ Logged to Diary!' : 'Save Decision ✦'}
+                <div className="pt-12 flex justify-center border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">
+                  <GlassButton variant="primary" onClick={handleSaveDecision} className="px-16 py-5 text-base shadow-elevated">
+                    {replaySaved ? 'Telemetry Logged' : 'Commit Configuration'}
                   </GlassButton>
                 </div>
               </div>
 
               {replaySaved && (
-                <div className="text-center pt-4">
-                  <Link href="/history" className="text-sm text-[var(--accent-gold)] font-medium hover:underline flex items-center justify-center gap-2">
-                    View your Fashion Diary <span>→</span>
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center pt-8">
+                  <Link href="/history" className="text-sm uppercase tracking-widest text-[var(--text-primary)] font-medium hover:opacity-70 transition-opacity flex items-center justify-center gap-4 glass-crystal rounded-full py-5 max-w-md mx-auto shadow-subtle hover:shadow-elevated">
+                    Review Telemetry Logs <span>→</span>
                   </Link>
-                </div>
+                </motion.div>
               )}
 
-              <div className="flex justify-start pt-8">
-                <GlassButton variant="secondary" onClick={() => setStep(6)}>
-                  ← Back to Experiment
+              <div className="flex justify-start pt-12 border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">
+                <GlassButton variant="secondary" onClick={() => setStep(6)} className="px-8 py-4 text-sm uppercase tracking-widest">
+                  Return to Micro-Adjustments
                 </GlassButton>
               </div>
             </motion.div>
@@ -892,7 +916,7 @@ function TestLookContent() {
 
 export default function TestLookPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading Studio...</div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center glass-deep"><div className="text-4xl animate-spin text-[var(--text-primary)] font-serif">✦</div></div>}>
       <TestLookContent />
     </Suspense>
   )

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { ThemeSwitcher } from './ThemeSwitcher'
 import { isDemoMode } from '@/lib/youcam'
 
@@ -24,7 +24,7 @@ export function GlassNav() {
   // Scroll-responsive nav
   useEffect(() => {
     function handleScroll() {
-      setScrolled(window.scrollY > 40)
+      setScrolled(window.scrollY > 10)
     }
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
@@ -36,7 +36,6 @@ export function GlassNav() {
     document.documentElement.setAttribute('data-appearance', next)
     localStorage.setItem('contextmirror_appearance', next)
 
-    // Switch default dark/light theme if appropriate
     if (next === 'dark') {
       document.documentElement.setAttribute('data-theme', 'midnight-couture')
       localStorage.setItem('contextmirror_theme', 'midnight-couture')
@@ -52,7 +51,6 @@ export function GlassNav() {
     { href: '/hair-studio', label: 'Hair Studio' },
     { href: '/wardrobe', label: 'Wardrobe' },
     { href: '/shopping-assistant', label: 'Shopping' },
-    { href: '/looks', label: 'Looks' },
     { href: '/history', label: 'History' },
     { href: '/settings', label: 'Settings' },
   ]
@@ -60,55 +58,57 @@ export function GlassNav() {
   return (
     <motion.nav
       className="sticky top-4 z-40 px-4 max-w-6xl mx-auto mb-8"
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      initial={{ y: -40, opacity: 0, filter: 'blur(10px)' }}
+      animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
     >
       <div
-        className={`glass-level-1 rounded-full flex items-center justify-between shadow-2xl transition-all duration-500 ${
-          scrolled ? 'px-5 py-2' : 'px-6 py-3'
-        }`}
-        style={{
-          backdropFilter: scrolled ? 'blur(32px) saturate(1.4)' : 'blur(24px)',
-        }}
+        className={\`glass-deep rounded-full flex items-center justify-between transition-all duration-500 \${
+          scrolled ? 'px-5 py-2.5 shadow-elevated scale-[0.98]' : 'px-6 py-3 shadow-subtle'
+        }\`}
       >
         {/* Brand */}
         <div className="flex items-center gap-3">
-          <Link href="/" className="font-serif text-2xl tracking-tight hover:opacity-80 transition-opacity">
+          <Link href="/" className="font-serif tracking-tight hover:opacity-80 transition-opacity flex items-center group relative overflow-hidden">
             <motion.span
               layoutId="brand"
-              className={`transition-all duration-500 ${scrolled ? 'text-xl' : 'text-2xl'}`}
+              className={\`transition-all duration-500 font-medium relative z-10 \${scrolled ? 'text-lg' : 'text-xl'}\`}
             >
               ContextMirror
             </motion.span>
+            {/* Soft highlight sweep on brand hover */}
+            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-[var(--text-primary)] to-transparent opacity-[0.05] z-0" />
           </Link>
-          <span className={`text-[10px] px-2.5 py-0.5 rounded-full glass-pill text-[var(--text-muted)] font-mono uppercase tracking-wider transition-all duration-500 ${
-            scrolled ? 'hidden' : 'hidden lg:inline-block'
-          }`}>
-            {isMock ? '🟡 Demo' : '🟢 YouCam API'}
+          <span className={\`premium-badge transition-all duration-500 \${
+            scrolled ? 'opacity-0 w-0 overflow-hidden px-0 border-0' : 'opacity-100'
+          }\`}>
+            {isMock ? 'Demo' : 'YouCam'}
           </span>
         </div>
 
         {/* Links */}
-        <div className="hidden md:flex items-center gap-0.5 relative">
+        <div className="hidden md:flex items-center gap-1 relative">
           {links.map(link => {
             const isActive = pathname === link.href
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className="relative px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors text-[var(--text-primary)]"
+                className={\`relative px-4 py-1.5 rounded-full text-sm font-medium transition-colors \${
+                  isActive 
+                    ? 'text-[var(--text-inverse)]' 
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                }\`}
               >
                 {isActive && (
                   <motion.div
-                    layoutId="activeNavPill"
-                    className="absolute inset-0 bg-[var(--text-primary)] rounded-full -z-10"
+                    layoutId="activeNavIndicator"
+                    className="absolute inset-0 bg-[var(--text-primary)] rounded-full z-[-1]"
+                    initial={false}
                     transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   />
                 )}
-                <span className={isActive ? 'text-[var(--bg-primary)] font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors'}>
-                  {link.highlight ? `⭐ ${link.label}` : link.label}
-                </span>
+                <span className="relative z-10">{link.label}</span>
               </Link>
             )
           })}
@@ -117,22 +117,16 @@ export function GlassNav() {
         {/* Controls */}
         <div className="flex items-center gap-2">
           {/* Mode toggle */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+          <button
             onClick={toggleAppearance}
-            className="glass-pill p-2 rounded-full text-xs hover:border-[var(--accent-gold)] transition-all"
-            title={`Appearance: ${appearance}`}
+            className="w-8 h-8 flex items-center justify-center rounded-full text-sm hover:bg-[var(--bg-muted)] transition-colors border border-transparent hover:border-[var(--border-color)] group relative overflow-hidden"
+            title={\`Appearance: \${appearance}\`}
           >
-            {appearance === 'light' ? '☀️' : '🌙'}
-          </motion.button>
+            <span className="relative z-10">{appearance === 'light' ? '☀️' : '🌙'}</span>
+          </button>
 
           {/* Theme switcher */}
           <ThemeSwitcher />
-
-          <Link href="/test-look" className="btn-primary text-xs px-4 py-1.5 hidden sm:inline-block">
-            Test Look
-          </Link>
         </div>
       </div>
     </motion.nav>

@@ -10,6 +10,7 @@ import { generateWardrobeOutfits } from '@/lib/wardrobeEngine'
 import { UploadZone } from '@/components/ui/UploadZone'
 import type { WardrobeItem, LookCandidate } from '@/types'
 import { useRouter } from 'next/navigation'
+import { ScrollReveal } from '@/components/ui/ScrollReveal'
 
 const CATEGORIES = ['All', 'Tops', 'Bottoms', 'Outerwear', 'Traditional', 'One-Piece', 'Footwear', 'Accessories']
 
@@ -69,8 +70,8 @@ export default function WardrobePage() {
     setIsUploading(true)
     setTimeout(() => {
       const newItems: WardrobeItem[] = uploadFiles.map((file, idx) => ({
-        id: `item-${Date.now()}-${idx}`,
-        name: `New Item ${idx + 1}`,
+        id: \`item-\${Date.now()}-\${idx}\`,
+        name: \`New Item \${idx + 1}\`,
         category: 'clothing',
         subcategory: 'Unknown',
         color: 'Unknown',
@@ -102,93 +103,88 @@ export default function WardrobePage() {
   }
 
   return (
-    <div className="min-h-screen pb-24">
-      {/* Animated Fashion Background */}
-      <div className="fixed inset-0 -z-10 bg-[#f7f4ed] overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#e8e4da] rounded-full blur-[100px] opacity-60 animate-pulse-slow"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-[#f0ebd8] rounded-full blur-[120px] opacity-50"></div>
-      </div>
-      
+    <div className="min-h-screen pb-24 font-ui text-[var(--text-primary)]">
       <GlassNav />
 
-      <main className="max-w-7xl mx-auto px-6 pt-4 space-y-12">
+      <main className="max-w-[90rem] mx-auto px-6 pt-12 space-y-16">
         
         {/* HERO SECTION */}
-        <div className="text-center space-y-6 pt-8 pb-4">
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="font-serif text-5xl md:text-6xl text-[#191919] font-normal tracking-tight"
+        <div className="text-center space-y-6 pt-8 pb-4 max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="space-y-6"
           >
-            Your Digital Wardrobe
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-[#6b6b6b] text-lg font-medium tracking-wide"
-          >
-            Everything you own. Endless ways to wear it.
-          </motion.p>
+            <span className="glass-crystal px-4 py-2 rounded-full text-xs font-medium uppercase tracking-widest inline-block shadow-subtle text-[var(--text-primary)]">
+              Digital Wardrobe
+            </span>
+            <h1 className="font-serif text-6xl md:text-8xl text-[var(--text-primary)] font-normal tracking-tight">
+              Personal Collection.
+            </h1>
+            <p className="text-[var(--text-muted)] text-xl font-light tracking-wide max-w-2xl mx-auto leading-relaxed">
+              Curate, evaluate, and compose. An intelligent architectural perspective on your daily presentation.
+            </p>
+          </motion.div>
 
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="flex flex-wrap justify-center gap-4 pt-6"
+            transition={{ delay: 0.3, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-wrap justify-center gap-6 pt-8"
           >
-            <GlassButton variant="secondary" onClick={() => setView('upload')} className="px-8 shadow-sm">
-              + Add Clothing
+            <GlassButton variant="secondary" onClick={() => setView('upload')} className="px-10 py-4 text-base">
+              Add Inventory
             </GlassButton>
-            <GlassButton variant="primary" onClick={() => setView('generate')} className="px-8 shadow-md">
-              ✨ Generate Outfit
+            <GlassButton variant="primary" onClick={() => setView('generate')} className="px-10 py-4 text-base">
+              Compose Outfit
             </GlassButton>
           </motion.div>
         </div>
 
         {/* WARDROBE INSIGHTS */}
         {view === 'grid' && (
-          <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="grid grid-cols-2 md:grid-cols-5 gap-4"
-          >
-            <div className="glass-card p-6 rounded-[2rem] flex flex-col justify-center items-center text-center shadow-sm">
-              <div className="font-serif text-3xl font-bold text-[#191919] mb-1">{stats.total}</div>
-              <div className="text-xs text-[#6b6b6b] font-bold uppercase tracking-wider">Total Items</div>
-            </div>
-            <div className="glass-card p-6 rounded-[2rem] flex flex-col justify-center text-sm shadow-sm md:col-span-4 bg-white/40">
-              <div className="flex justify-between items-center h-full">
-                <div className="space-y-1">
-                  <div className="text-xs font-bold text-[#6b6b6b] uppercase tracking-wider">Composition</div>
-                  <div className="flex gap-4 text-[#191919] font-medium">
-                    <span>{stats.tops} Tops</span>
-                    <span>{stats.bottoms} Bottoms</span>
-                    <span>{stats.shoes} Shoes</span>
-                    <span>{stats.outerwear} Outerwear</span>
+          <ScrollReveal>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+              <div className="glass-deep rounded-[2rem] p-8 flex flex-col justify-center items-center text-center shadow-subtle group hover:scale-[1.02] transition-transform duration-500">
+                <div className="font-numeric text-6xl font-light text-[var(--text-primary)] mb-2 tracking-tighter">{stats.total}</div>
+                <div className="text-xs text-[var(--text-muted)] font-medium uppercase tracking-widest">Total Items</div>
+              </div>
+              <div className="glass-soft rounded-[2rem] p-10 flex flex-col justify-center text-sm md:col-span-4 relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-tr from-[var(--text-primary)] to-transparent opacity-[0.02] group-hover:opacity-[0.04] transition-opacity duration-500" />
+                <div className="flex justify-between items-center h-full relative z-10">
+                  <div className="space-y-3">
+                    <div className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-widest">Composition</div>
+                    <div className="flex gap-8 text-[var(--text-primary)] font-medium tracking-wide text-base">
+                      <span>{stats.tops} Tops</span>
+                      <span>{stats.bottoms} Bottoms</span>
+                      <span>{stats.shoes} Footwear</span>
+                      <span>{stats.outerwear} Outerwear</span>
+                    </div>
                   </div>
-                </div>
-                <div className="hidden md:block text-right">
-                  <div className="text-xs font-bold text-[#6b6b6b] uppercase tracking-wider mb-1">Most Worn</div>
-                  <div className="text-[#191919] font-medium">{wardrobe.length > 0 ? wardrobe.sort((a,b)=>b.wearCount - a.wearCount)[0].name : 'N/A'}</div>
+                  <div className="hidden md:block text-right">
+                    <div className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-widest mb-3">Most Utilized</div>
+                    <div className="text-[var(--text-primary)] font-serif text-2xl font-normal">{wardrobe.length > 0 ? wardrobe.sort((a,b)=>b.wearCount - a.wearCount)[0].name : 'N/A'}</div>
+                  </div>
                 </div>
               </div>
             </div>
-          </motion.div>
+          </ScrollReveal>
         )}
 
         {/* CATEGORY NAV */}
         {view === 'grid' && (
-          <div className="glass-level-1 p-2 rounded-full flex overflow-x-auto hide-scrollbar gap-1 shadow-sm sticky top-24 z-30">
+          <div className="glass-crystal rounded-[2rem] p-2 flex overflow-x-auto hide-scrollbar gap-2 sticky top-24 z-30 shadow-elevated">
             {CATEGORIES.map(cat => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`relative px-6 py-3 rounded-full text-sm font-bold transition-all whitespace-nowrap ${
-                  activeCategory === cat ? 'text-white' : 'text-[#6b6b6b] hover:text-[#191919]'
-                }`}
+                className={\`relative px-8 py-3 text-sm tracking-widest uppercase font-medium transition-all whitespace-nowrap rounded-[1.5rem] \${
+                  activeCategory === cat ? 'text-[var(--bg-primary)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                }\`}
               >
                 {activeCategory === cat && (
-                  <motion.div layoutId="wardrobeCat" className="absolute inset-0 bg-[#191919] rounded-full -z-10 shadow-md" />
+                  <motion.div layoutId="wardrobeCat" className="absolute inset-0 bg-[var(--text-primary)] -z-10 shadow-md rounded-[1.5rem]" />
                 )}
                 {cat}
               </button>
@@ -201,54 +197,57 @@ export default function WardrobePage() {
           
           {/* GRID VIEW */}
           {view === 'grid' && (
-            <motion.div key="grid" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-12">
+            <motion.div key="grid" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }} className="space-y-16">
               
               {/* Rediscoveries Section */}
               {rediscoveries.length > 0 && activeCategory === 'All' && (
-                <div className="space-y-6">
-                  <h2 className="font-serif text-2xl font-bold text-[#191919]">Give These Another Life</h2>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {rediscoveries.slice(0, 4).map(item => (
-                      <div key={item.id} className="glass-card rounded-[1.5rem] p-4 flex gap-4 items-center shadow-sm">
-                        <img src={item.imageUrl} className="w-16 h-16 rounded-xl object-cover" />
-                        <div>
-                          <div className="text-sm font-bold text-[#191919]">{item.name}</div>
-                          <div className="text-xs text-[#6b6b6b]">Not worn in 90+ days</div>
-                        </div>
-                      </div>
-                    ))}
+                <ScrollReveal>
+                  <div className="space-y-8 glass-soft p-10 rounded-[2rem]">
+                    <h2 className="font-serif text-3xl font-normal text-[var(--text-primary)] border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-4">Dormant Inventory</h2>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                      {rediscoveries.slice(0, 4).map((item, i) => (
+                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.1 }} key={item.id} className="glass-frosted rounded-3xl p-4 flex gap-4 items-center transition-all hover:scale-105 group cursor-pointer">
+                          <img src={item.imageUrl} className="w-20 h-20 object-cover rounded-2xl" />
+                          <div>
+                            <div className="text-base font-medium text-[var(--text-primary)]">{item.name}</div>
+                            <div className="text-[10px] uppercase tracking-widest text-[var(--text-muted)] mt-1 bg-[var(--bg-muted)] px-2 py-1 inline-block rounded-md">Inactive &gt; 90d</div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                </ScrollReveal>
               )}
 
               {/* Masonry Grid */}
-              <div className="columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6">
+              <div className="columns-2 md:columns-3 lg:columns-4 gap-8 space-y-8">
                 {filteredWardrobe.map((item, idx) => (
-                  <div key={item.id} className="break-inside-avoid relative group rounded-[2rem] overflow-hidden bg-white/50 shadow-sm hover:shadow-xl transition-all duration-500">
-                    <img src={item.imageUrl} className="w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
-                    
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    
-                    <button 
-                      onClick={() => { toggleFavoriteItem(item.id); setWardrobe([...wardrobe]); }}
-                      className="absolute top-4 right-4 text-2xl drop-shadow-md z-10 transition-transform hover:scale-110"
-                    >
-                      {item.favorite ? '♥' : '♡'}
-                    </button>
+                  <ScrollReveal key={item.id}>
+                    <div className="break-inside-avoid relative group overflow-hidden glass-deep rounded-[2rem] transition-all duration-700 hover:shadow-elevated transform hover:-translate-y-2">
+                      <img src={item.imageUrl} className="w-full object-cover transition-transform duration-[2000ms] group-hover:scale-[1.03]" loading="lazy" />
+                      
+                      <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-transparent to-transparent opacity-0 group-hover:opacity-90 transition-opacity duration-500" />
+                      
+                      <button 
+                        onClick={() => { toggleFavoriteItem(item.id); setWardrobe([...wardrobe]); }}
+                        className="absolute top-6 right-6 text-2xl drop-shadow-md z-10 transition-transform hover:scale-125 text-[var(--text-primary)] glass-crystal w-10 h-10 flex items-center justify-center rounded-full"
+                      >
+                        {item.favorite ? '♥' : '♡'}
+                      </button>
 
-                    <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                      <div className="text-white font-serif text-xl font-bold mb-1">{item.name}</div>
-                      <div className="flex flex-wrap gap-2 text-xs font-medium text-white/80">
-                        <span className="capitalize">{item.category}</span>
-                        <span>·</span>
-                        <span className="capitalize">{item.formality}</span>
-                      </div>
-                      <div className="mt-4 flex gap-2">
-                        <button className="glass-liquid flex-1 py-2 rounded-xl text-xs font-bold text-white shadow-sm backdrop-blur-md bg-white/20 hover:bg-white/30">Edit</button>
-                        <button className="glass-liquid flex-1 py-2 rounded-xl text-xs font-bold text-white shadow-sm backdrop-blur-md bg-white/20 hover:bg-white/30">Build Outfit</button>
+                      <div className="absolute bottom-0 left-0 right-0 p-8 translate-y-6 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                        <div className="text-[var(--text-primary)] font-serif text-2xl font-normal mb-2">{item.name}</div>
+                        <div className="flex flex-wrap gap-2 text-[10px] uppercase tracking-widest font-medium text-[var(--text-muted)]">
+                          <span className="glass-soft px-2 py-1 rounded-md">{item.category}</span>
+                          <span className="glass-soft px-2 py-1 rounded-md">{item.formality}</span>
+                        </div>
+                        <div className="mt-6 flex gap-3">
+                          <button className="flex-1 py-3 text-xs font-medium uppercase tracking-widest text-[var(--text-primary)] glass-crystal hover:bg-[var(--text-primary)] hover:text-[var(--bg-primary)] transition-colors rounded-full">Edit</button>
+                          <button className="flex-1 py-3 text-xs font-medium uppercase tracking-widest text-[var(--text-primary)] glass-crystal hover:bg-[var(--text-primary)] hover:text-[var(--bg-primary)] transition-colors rounded-full">Compose</button>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </ScrollReveal>
                 ))}
               </div>
             </motion.div>
@@ -256,149 +255,151 @@ export default function WardrobePage() {
 
           {/* UPLOAD VIEW */}
           {view === 'upload' && (
-             <motion.div key="upload" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="max-w-4xl mx-auto space-y-8 bg-white/60 backdrop-blur-xl p-10 rounded-[3rem] shadow-xl border border-white/50">
-               <div className="flex justify-between items-center">
-                 <h2 className="font-serif text-4xl font-normal text-[#191919]">Add to Wardrobe</h2>
-                 <button onClick={() => setView('grid')} className="text-[#6b6b6b] hover:text-[#191919] font-bold">✕ Close</button>
+             <motion.div key="upload" initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }} className="max-w-4xl mx-auto space-y-10 glass-deep p-12 rounded-[3rem]">
+               <div className="flex justify-between items-center border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-6">
+                 <h2 className="font-serif text-4xl font-normal text-[var(--text-primary)]">Inventory Ingestion</h2>
+                 <button onClick={() => setView('grid')} className="text-sm uppercase tracking-widest font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] underline underline-offset-4">Cancel</button>
                </div>
                
-               <div className="border-2 border-dashed border-[#d4cfc4] rounded-[2rem] p-12 text-center relative hover:border-[#191919] transition-colors cursor-pointer bg-white/30">
+               <div className="border-[2px] border-dashed border-[var(--text-muted)] rounded-[2rem] p-16 text-center relative hover:border-[var(--text-primary)] transition-colors cursor-pointer bg-[color-mix(in_srgb,var(--bg-primary)_50%,transparent)] group overflow-hidden">
                  <input type="file" multiple accept="image/*" onChange={(e) => handleMultiUpload(e.target.files)} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
-                 <div className="text-6xl mb-4">📸</div>
-                 <h3 className="text-xl font-bold text-[#191919] mb-2">Upload Multiple Items</h3>
-                 <p className="text-[#6b6b6b] text-sm">Drag & drop or click to select files.</p>
+                 <div className="text-5xl mb-6 text-[var(--text-muted)] group-hover:text-[var(--text-primary)] group-hover:-translate-y-2 transition-all duration-500 font-serif font-light">↑</div>
+                 <h3 className="text-xl font-medium text-[var(--text-primary)] mb-3 uppercase tracking-widest">Select Files</h3>
+                 <p className="text-[var(--text-muted)] text-base">Drag & drop or click to ingest items into your digital closet.</p>
                </div>
 
                {uploadPreviews.length > 0 && (
-                 <div className="space-y-6">
-                   <h3 className="font-serif text-2xl text-[#191919]">{uploadPreviews.length} NEW ITEMS</h3>
-                   <div className="grid grid-cols-4 md:grid-cols-6 gap-4">
+                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-8 pt-4">
+                   <h3 className="font-medium text-sm text-[var(--text-muted)] uppercase tracking-widest border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-4">Pending Ingestion ({uploadPreviews.length})</h3>
+                   <div className="grid grid-cols-4 md:grid-cols-6 gap-6">
                      {uploadPreviews.map((src, i) => (
-                       <div key={i} className="aspect-square rounded-2xl overflow-hidden shadow-sm">
-                         <img src={src} className="w-full h-full object-cover" />
-                       </div>
+                       <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }} key={i} className="aspect-square overflow-hidden rounded-[1.5rem] glass-soft p-1">
+                         <img src={src} className="w-full h-full object-cover rounded-[1.25rem]" />
+                       </motion.div>
                      ))}
                    </div>
-                   <GlassButton variant="primary" onClick={commitUploads} disabled={isUploading} className="w-full py-4 text-lg shadow-lg">
-                     {isUploading ? 'Adding to Wardrobe...' : `Add ${uploadPreviews.length} Items ✦`}
+                   <GlassButton variant="primary" onClick={commitUploads} disabled={isUploading} className="w-full py-5 text-base">
+                     {isUploading ? 'Processing and Tagging...' : \`Commit \${uploadPreviews.length} Items\`}
                    </GlassButton>
-                 </div>
+                 </motion.div>
                )}
              </motion.div>
           )}
 
           {/* GENERATE OUTFIT VIEW */}
           {view === 'generate' && (
-             <motion.div key="generate" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-8">
-               <div className="flex justify-between items-center max-w-4xl mx-auto">
-                 <h2 className="font-serif text-4xl font-normal text-[#191919]">Generate Outfits</h2>
-                 <button onClick={() => setView('grid')} className="text-[#6b6b6b] hover:text-[#191919] font-bold">✕ Close</button>
+             <motion.div key="generate" initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} exit={{ opacity: 0 }} transition={{ duration: 0.6 }} className="space-y-12 max-w-6xl mx-auto">
+               <div className="flex justify-between items-center border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-8">
+                 <h2 className="font-serif text-5xl font-normal text-[var(--text-primary)]">Composition Engine</h2>
+                 <button onClick={() => setView('grid')} className="text-sm uppercase tracking-widest font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] underline underline-offset-4">Cancel</button>
                </div>
 
                {!generatedOutfits.length && !isGenerating && (
-                 <div className="max-w-4xl mx-auto bg-white/60 backdrop-blur-xl p-10 rounded-[3rem] shadow-xl border border-white/50 space-y-8">
-                   <div className="grid md:grid-cols-2 gap-8">
-                     <div>
-                       <label className="block text-sm font-bold text-[#6b6b6b] uppercase tracking-wider mb-3">What are you dressing for?</label>
-                       <select value={occasion} onChange={e => setOccasion(e.target.value)} className="w-full p-4 rounded-2xl glass-pill focus:outline-none text-lg">
-                         <option value="Office">Office</option>
-                         <option value="Wedding">Wedding</option>
-                         <option value="Party">Party</option>
-                         <option value="College">College</option>
-                         <option value="Date">Date</option>
-                         <option value="Travel">Travel</option>
-                         <option value="Casual">Casual Day</option>
+                 <div className="glass-deep rounded-[3rem] p-12 space-y-12">
+                   <div className="grid md:grid-cols-2 gap-12">
+                     <div className="space-y-6">
+                       <label className="block text-sm font-medium text-[var(--text-primary)] uppercase tracking-widest">Target Context</label>
+                       <select value={occasion} onChange={e => setOccasion(e.target.value)} className="w-full p-5 rounded-2xl glass-soft border border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] focus:outline-none focus:border-[var(--text-primary)] text-base text-[var(--text-primary)] uppercase tracking-wider appearance-none cursor-pointer">
+                         <option value="Office">Corporate / Office</option>
+                         <option value="Wedding">Wedding / Formal</option>
+                         <option value="Party">Social Event / Party</option>
+                         <option value="College">Academic / College</option>
+                         <option value="Date">Date / Evening</option>
+                         <option value="Travel">Transit / Travel</option>
+                         <option value="Casual">Everyday / Casual</option>
                        </select>
                      </div>
-                     <div>
-                       <label className="block text-sm font-bold text-[#6b6b6b] uppercase tracking-wider mb-3">Weather (Optional)</label>
-                       <select value={weather} onChange={e => setWeather(e.target.value)} className="w-full p-4 rounded-2xl glass-pill focus:outline-none text-lg">
-                         <option value="">Any</option>
-                         <option value="hot">Hot</option>
-                         <option value="cold">Cold</option>
-                         <option value="rainy">Rainy</option>
+                     <div className="space-y-6">
+                       <label className="block text-sm font-medium text-[var(--text-primary)] uppercase tracking-widest">Environmental Condition</label>
+                       <select value={weather} onChange={e => setWeather(e.target.value)} className="w-full p-5 rounded-2xl glass-soft border border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] focus:outline-none focus:border-[var(--text-primary)] text-base text-[var(--text-primary)] uppercase tracking-wider appearance-none cursor-pointer">
+                         <option value="">Unspecified</option>
+                         <option value="hot">High Temp (Hot)</option>
+                         <option value="cold">Low Temp (Cold)</option>
+                         <option value="rainy">Precipitation (Rainy)</option>
                        </select>
                      </div>
                    </div>
                    
-                   <GlassButton variant="primary" onClick={handleGenerate} className="w-full py-5 text-xl shadow-lg">
-                     ✨ Generate from my Wardrobe
-                   </GlassButton>
-                 </div>
-               )}
-
-               {isGenerating && (
-                 <div className="max-w-md mx-auto text-center py-20 space-y-6">
-                   <div className="text-6xl animate-pulse">✨</div>
-                   <h3 className="font-serif text-2xl font-bold text-[#191919]">Building looks from your wardrobe...</h3>
-                   <div className="space-y-2 text-sm text-[#6b6b6b] font-medium text-left max-w-xs mx-auto pl-8">
-                     <p>✓ Checking occasion requirements</p>
-                     <p>✓ Finding compatible items</p>
-                     <p>✓ Matching color harmony</p>
-                     <p className="animate-pulse">● Assembling outfits</p>
+                   <div className="pt-8 border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">
+                     <GlassButton variant="primary" onClick={handleGenerate} className="w-full py-5 text-base shadow-elevated">
+                       Execute Composition
+                     </GlassButton>
                    </div>
                  </div>
                )}
 
+               {isGenerating && (
+                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-32 space-y-10 glass-soft rounded-[3rem]">
+                   <div className="w-20 h-20 border-[2px] border-transparent border-t-[var(--text-primary)] border-r-[var(--text-primary)] rounded-full animate-spin-slow opacity-80 mx-auto" />
+                   <h3 className="font-serif text-4xl font-normal text-[var(--text-primary)]">Synthesizing Configurations</h3>
+                   <div className="space-y-4 text-base text-[var(--text-muted)] font-medium text-center mx-auto bg-[var(--surface)] inline-block p-6 rounded-[2rem] shadow-subtle border border-[var(--border-color)]">
+                     <p className="uppercase tracking-widest text-xs flex items-center justify-between gap-8"><span>Evaluating parameters</span> <span className="font-numeric">100%</span></p>
+                     <p className="uppercase tracking-widest text-xs flex items-center justify-between gap-8"><span>Scanning inventory</span> <span className="font-numeric">100%</span></p>
+                     <p className="uppercase tracking-widest text-xs flex items-center justify-between gap-8 text-[var(--text-primary)] animate-pulse"><span>Compiling looks</span> <span className="font-numeric">Wait...</span></p>
+                   </div>
+                 </motion.div>
+               )}
+
                {generatedOutfits.length > 0 && !isGenerating && (
-                 <div className="space-y-12">
-                   <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="space-y-12">
+                   <div className="grid lg:grid-cols-2 gap-10">
                      {generatedOutfits.map((look, idx) => (
-                       <div key={look.id} className="bg-white/70 backdrop-blur-2xl rounded-[3rem] p-8 shadow-2xl border border-white flex flex-col group">
-                         <div className="flex justify-between items-start mb-6 border-b border-[#e8e4da] pb-6">
+                       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: idx * 0.1 }} key={look.id} className="glass-deep rounded-[3rem] p-10 flex flex-col group overflow-hidden">
+                         <div className="flex justify-between items-start mb-8 border-b border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pb-6">
                            <div>
-                             <div className="text-xs font-bold text-[#6b6b6b] uppercase tracking-widest mb-1">Look {idx + 1}</div>
-                             <h3 className="font-serif text-3xl font-bold text-[#191919]">{look.name}</h3>
+                             <div className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-widest mb-3 glass-soft px-3 py-1 rounded-full inline-block">Configuration {idx + 1}</div>
+                             <h3 className="font-serif text-3xl font-normal text-[var(--text-primary)]">{look.name}</h3>
                            </div>
                            <div className="text-right">
-                             <div className="text-3xl font-numeric font-bold text-[#191919]">{look.contextMirrorScore}</div>
-                             <div className="text-[10px] uppercase font-bold text-[#6b6b6b]">Match Score</div>
+                             <div className="text-5xl font-numeric font-light text-[var(--text-primary)] tracking-tighter">{look.contextMirrorScore}</div>
+                             <div className="text-[10px] uppercase font-medium text-[var(--text-muted)] tracking-widest mt-1">Viability Score</div>
                            </div>
                          </div>
                          
                          {/* Fashion Lookbook Composition */}
-                         <div className="flex-1 flex gap-4 mb-8">
+                         <div className="flex-1 flex gap-6 mb-10">
                            {/* Main item (Top/Outerwear) */}
-                           <div className="w-1/2 rounded-[2rem] overflow-hidden shadow-md relative">
-                             <img src={look.items[0]?.imageUrl} className="w-full h-full object-cover" />
+                           <div className="w-1/2 glass-soft p-2 rounded-[2rem] overflow-hidden group/item cursor-pointer relative">
+                             <img src={look.items[0]?.imageUrl} className="w-full h-full object-cover rounded-[1.5rem] grayscale-[10%] group-hover/item:scale-105 transition-transform duration-[2000ms]" />
                            </div>
-                           <div className="w-1/2 flex flex-col gap-4">
+                           <div className="w-1/2 flex flex-col gap-6">
                              {/* Bottom */}
-                             <div className="flex-1 rounded-[1.5rem] overflow-hidden shadow-sm relative">
-                               <img src={look.items[1]?.imageUrl} className="w-full h-full object-cover" />
+                             <div className="flex-1 glass-soft p-2 rounded-[2rem] overflow-hidden group/item cursor-pointer relative">
+                               <img src={look.items[1]?.imageUrl} className="w-full h-full object-cover rounded-[1.5rem] grayscale-[10%] group-hover/item:scale-105 transition-transform duration-[2000ms]" />
                              </div>
                              {/* Shoes/Accessories */}
-                             <div className="h-24 flex gap-4">
+                             <div className="h-32 flex gap-6">
                                {look.items.slice(2).map((item, i) => (
-                                 <div key={i} className="flex-1 rounded-xl overflow-hidden shadow-sm relative">
-                                   <img src={item.imageUrl} className="w-full h-full object-cover" />
+                                 <div key={i} className="flex-1 glass-soft p-1 rounded-3xl overflow-hidden group/item cursor-pointer relative">
+                                   <img src={item.imageUrl} className="w-full h-full object-cover rounded-[1.25rem] grayscale-[10%] group-hover/item:scale-105 transition-transform duration-[2000ms]" />
                                  </div>
                                ))}
                              </div>
                            </div>
                          </div>
 
-                         <div className="glass-pill p-5 rounded-2xl mb-6">
-                           <div className="text-xs font-bold text-[#191919] mb-1">Why this outfit?</div>
-                           <p className="text-sm text-[#6b6b6b] leading-relaxed">{look.explanation}</p>
+                         <div className="glass-soft p-8 rounded-3xl mb-10 relative overflow-hidden">
+                           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--text-primary)] to-transparent opacity-[0.02]" />
+                           <div className="text-xs uppercase tracking-widest font-medium text-[var(--text-primary)] mb-3 relative z-10">Rationale</div>
+                           <p className="text-base text-[var(--text-muted)] leading-relaxed relative z-10">{look.explanation}</p>
                          </div>
 
-                         <div className="grid grid-cols-2 gap-4 mt-auto">
-                           <button className="glass-pill py-3 rounded-xl font-bold text-[#191919] shadow-sm hover:shadow-md transition-shadow">Change One Item</button>
-                           <button onClick={() => router.push('/test-look')} className="bg-[#191919] text-white py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-shadow">
-                             Test This Look →
+                         <div className="grid grid-cols-2 gap-6 mt-auto">
+                           <button className="py-4 text-xs uppercase tracking-widest font-medium text-[var(--text-primary)] glass-crystal hover:bg-[var(--text-primary)] hover:text-[var(--bg-primary)] transition-colors rounded-full shadow-subtle hover:shadow-elevated">Modify Component</button>
+                           <button onClick={() => router.push('/test-look')} className="bg-[var(--text-primary)] text-[var(--bg-primary)] py-4 text-xs uppercase tracking-widest font-medium transition-transform hover:bg-[var(--text-primary)]/90 rounded-full shadow-subtle hover:shadow-elevated">
+                             Evaluate Look
                            </button>
                          </div>
-                       </div>
+                       </motion.div>
                      ))}
                    </div>
                    
-                   <div className="text-center">
-                     <GlassButton variant="secondary" onClick={() => setGeneratedOutfits([])}>
-                       ← Back to Generator Options
+                   <div className="text-center pt-10 border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">
+                     <GlassButton variant="secondary" onClick={() => setGeneratedOutfits([])} className="text-sm uppercase tracking-widest px-8 py-4">
+                       Reset Generator
                      </GlassButton>
                    </div>
-                 </div>
+                 </motion.div>
                )}
              </motion.div>
           )}
