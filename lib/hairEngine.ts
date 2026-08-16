@@ -27,12 +27,12 @@ export interface HairstyleTryOn {
 // ── Recommendation Engine ──────────────────────────────────────────────────
 
 const HAIRSTYLE_LIBRARY: Omit<HairstyleCandidate, 'compatibilityScore' | 'whyRecommended'>[] = [
-  { id: 'hs-1', name: 'Textured Crop', category: 'Short', imageUrl: 'https://images.unsplash.com/photo-1620331311520-246422fd82f9?w=600&q=80', maintenanceLevel: 'low' },
-  { id: 'hs-2', name: 'Soft Waves', category: 'Long', imageUrl: 'https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=600&q=80', maintenanceLevel: 'medium' },
-  { id: 'hs-3', name: 'Classic Side Part', category: 'Professional', imageUrl: 'https://images.unsplash.com/photo-1582233479966-d466fa3594b5?w=600&q=80', maintenanceLevel: 'medium' },
-  { id: 'hs-4', name: 'Shoulder Length Layers', category: 'Medium', imageUrl: 'https://images.unsplash.com/photo-1522337660859-02fbefca4702?w=600&q=80', maintenanceLevel: 'high' },
-  { id: 'hs-5', name: 'Defined Curls', category: 'Curly/Wavy', imageUrl: 'https://images.unsplash.com/photo-1531123897727-8f129e1bfa8c?w=600&q=80', maintenanceLevel: 'high' },
-  { id: 'hs-6', name: 'Clean Buzz Cut', category: 'Short', imageUrl: 'https://images.unsplash.com/photo-1518577915332-c2a19f149a75?w=600&q=80', maintenanceLevel: 'low' },
+  { id: 'hs-1', name: 'Textured Crop', category: 'Short', imageUrl: 'https://images.unsplash.com/photo-1599839619722-39751411ea63?w=600&q=80', maintenanceLevel: 'low' },
+  { id: 'hs-2', name: 'Soft Waves', category: 'Long', imageUrl: 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=600&q=80', maintenanceLevel: 'medium' },
+  { id: 'hs-3', name: 'Classic Side Part', category: 'Professional', imageUrl: 'https://images.unsplash.com/photo-1622281549424-fd9a0e41a2e0?w=600&q=80', maintenanceLevel: 'medium' },
+  { id: 'hs-4', name: 'Shoulder Length Layers', category: 'Medium', imageUrl: 'https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=600&q=80', maintenanceLevel: 'high' },
+  { id: 'hs-5', name: 'Defined Curls', category: 'Curly/Wavy', imageUrl: 'https://images.unsplash.com/photo-1512303452027-750531d7cb7f?w=600&q=80', maintenanceLevel: 'high' },
+  { id: 'hs-6', name: 'Clean Buzz Cut', category: 'Short', imageUrl: 'https://images.unsplash.com/photo-1605801700683-f54f738090b8?w=600&q=80', maintenanceLevel: 'low' },
 ]
 
 export function recommendHairstyles(profile: HairProfile, prefs: HairPreferences): HairstyleCandidate[] {

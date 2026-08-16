@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { GlassNav } from '@/components/ui/GlassNav'
 import { getDecisionHistory } from '@/lib/memory'
 import type { DecisionReplayEntry } from '@/types'
 
@@ -16,7 +15,6 @@ export default function LooksPage() {
   return (
     <div className="min-h-screen pb-24">
       {/* Floating Glass Header Nav */}
-      <GlassNav />
 
       <main className="max-w-5xl mx-auto px-6 pt-4 space-y-8">
         <div className="flex justify-between items-center">

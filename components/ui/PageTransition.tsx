@@ -58,7 +58,7 @@ export function PageTransition({ children }: { children: ReactNode }) {
   const variants = getTransitionVariants(pathname)
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence>
       <motion.div
         key={pathname}
         initial={variants.initial}

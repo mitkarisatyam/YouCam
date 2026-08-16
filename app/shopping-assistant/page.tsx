@@ -2,13 +2,13 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { GlassNav } from '@/components/ui/GlassNav'
 import { GlassButton } from '@/components/ui/GlassButton'
 import { evaluatePurchase } from '@/lib/shoppingEngine'
 import { logTestPurchase } from '@/lib/memory'
-import { providers } from '@/lib/providers'
+import { getApparelVTOProvider } from '@/lib/youcam'
+import { UploadZone } from '@/components/ui/UploadZone'
 import type { ShoppingItem, PurchaseDecisionScore } from '@/types'
-import type { VTOResult } from '@/lib/providers/apparel'
+import type { VTOResult } from '@/lib/youcam/types'
 import { useRouter } from 'next/navigation'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 
@@ -21,17 +21,19 @@ export default function ShoppingAssistantPage() {
   const [shoppingItem, setShoppingItem] = useState<ShoppingItem | null>(null)
   const [score, setScore] = useState<PurchaseDecisionScore | null>(null)
   const [vtoResult, setVtoResult] = useState<VTOResult | null>(null)
+  const [stagedFile, setStagedFile] = useState<File | null>(null)
+  const [garmentPreview, setGarmentPreview] = useState<string>('')
 
-  const handleUpload = () => {
+  const handleUpload = (file: File) => {
     setView('analyzing')
     
     setTimeout(() => {
       // Mock analyzing an uploaded garment
       const item: ShoppingItem = {
         id: `shop-${Date.now()}`,
-        imageUrl: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&q=80',
+        imageUrl: URL.createObjectURL(file),
         category: 'Outerwear',
-        color: 'Brown',
+        color: 'Neutral',
         pattern: 'Solid',
         styleTags: ['Casual', 'Smart Casual'],
         formality: 'casual'
@@ -53,14 +55,11 @@ export default function ShoppingAssistantPage() {
   const handleVto = async () => {
     if (!shoppingItem) return
     setView('vto')
-    setVtoResult({ originalImage: '', resultImageUrl: '', status: 'pending' })
+    setVtoResult({ id: 'pending', imageUrl: '', status: 'pending' })
     
     try {
-      const res = await providers.apparel.generate({
-        userImage: 'mock_user_selfie.jpg',
-        garmentImage: shoppingItem.imageUrl,
-        category: 'outerwear'
-      })
+      const provider = getApparelVTOProvider()
+      const res = await provider.generate('mock_user_id', shoppingItem.id)
       setVtoResult(res)
     } catch (e) {
       console.error(e)
@@ -69,7 +68,6 @@ export default function ShoppingAssistantPage() {
 
   return (
     <div className="min-h-screen pb-24 font-ui text-[var(--text-primary)]">
-      <GlassNav />
 
       <main className="max-w-[85rem] mx-auto px-6 pt-12">
         <AnimatePresence mode="wait">
@@ -88,13 +86,22 @@ export default function ShoppingAssistantPage() {
                 Ingest a reference image of a prospective garment. Evaluate compatibility with existing inventory, visualize via VTO, and generate a definitive acquisition score.
               </p>
 
-              <div className="glass-deep rounded-[3rem] p-16 w-full max-w-4xl border-[2px] border-dashed border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] hover:border-[var(--text-primary)] transition-all duration-500 flex flex-col items-center justify-center space-y-8 group cursor-pointer relative overflow-hidden" onClick={handleUpload}>
-                <div className="absolute inset-0 bg-gradient-to-t from-transparent via-[var(--text-primary)] to-transparent opacity-[0.02] group-hover:translate-y-full transition-transform duration-[2000ms] ease-in-out" />
-                <div className="text-6xl text-[var(--text-muted)] group-hover:text-[var(--text-primary)] group-hover:-translate-y-2 transition-all duration-500 font-serif font-light relative z-10">↑</div>
-                <div className="space-y-4 relative z-10">
-                  <h3 className="font-medium text-2xl uppercase tracking-widest text-[var(--text-primary)]">Ingest Reference Material</h3>
-                  <p className="text-base text-[var(--text-muted)]">Select or drag image to initialize evaluation.</p>
-                </div>
+              <div className="w-full max-w-4xl mx-auto space-y-6 tilt-card">
+                <UploadZone
+                  label="Ingest Reference Material"
+                  sublabel="Select or drag image to initialize evaluation."
+                  currentPreview={garmentPreview}
+                  loading={false}
+                  onFileSelect={(file) => {
+                    setGarmentPreview(URL.createObjectURL(file))
+                    setStagedFile(file)
+                  }}
+                />
+                {stagedFile && (
+                  <GlassButton variant="primary" onClick={() => handleUpload(stagedFile)} className="w-full py-4 text-base shadow-elevated">
+                    Execute Evaluation ✦
+                  </GlassButton>
+                )}
               </div>
             </motion.div>
           )}

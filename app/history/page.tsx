@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { GlassNav } from '@/components/ui/GlassNav'
 import { GlassButton } from '@/components/ui/GlassButton'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { getHistory, getWardrobe, logOutfit } from '@/lib/memory'
@@ -49,7 +48,6 @@ export default function HistoryPage() {
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2000')] opacity-[0.03] mix-blend-overlay object-cover pointer-events-none" />
       </div>
 
-      <GlassNav />
 
       <main className="max-w-4xl mx-auto px-6 pt-16 space-y-16">
         {/* Header */}

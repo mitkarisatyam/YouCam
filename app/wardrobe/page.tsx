@@ -3,9 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { GlassNav } from '@/components/ui/GlassNav'
 import { GlassButton } from '@/components/ui/GlassButton'
-import { getWardrobe, addMultipleItems, toggleFavoriteItem, getRediscoveries } from '@/lib/memory'
+import { getWardrobe, addMultipleItems, toggleFavoriteItem, getRediscoveries, deleteItem, updateItem, hybridSearch } from '@/lib/memory'
 import { generateWardrobeOutfits } from '@/lib/wardrobeEngine'
 import { UploadZone } from '@/components/ui/UploadZone'
 import type { WardrobeItem, LookCandidate } from '@/types'
@@ -19,6 +18,7 @@ export default function WardrobePage() {
   const [wardrobe, setWardrobe] = useState<WardrobeItem[]>([])
   const [rediscoveries, setRediscoveries] = useState<WardrobeItem[]>([])
   const [activeCategory, setActiveCategory] = useState('All')
+  const [searchQuery, setSearchQuery] = useState('')
   const [view, setView] = useState<'grid' | 'upload' | 'generate'>('grid')
   
   // Upload State
@@ -37,18 +37,20 @@ export default function WardrobePage() {
     setRediscoveries(getRediscoveries())
   }, [view])
 
-  const filteredWardrobe = activeCategory === 'All' 
-    ? wardrobe 
-    : wardrobe.filter(i => {
-        if (activeCategory === 'Tops') return ['tops', 'clothing'].includes(i.category) && !i.subcategory.includes('pant')
-        if (activeCategory === 'Bottoms') return ['bottoms', 'clothing'].includes(i.category) && i.subcategory.includes('pant')
-        if (activeCategory === 'Outerwear') return i.category === 'outerwear'
-        if (activeCategory === 'Traditional') return i.category === 'traditional'
-        if (activeCategory === 'One-Piece') return i.category === 'one-piece'
-        if (activeCategory === 'Footwear') return i.category === 'footwear'
-        if (activeCategory === 'Accessories') return ['accessories', 'jewelry', 'bag'].includes(i.category)
-        return true
-      })
+  const filteredWardrobe = searchQuery 
+    ? hybridSearch(searchQuery).map(r => r.item)
+    : activeCategory === 'All' 
+      ? wardrobe 
+      : wardrobe.filter(i => {
+          if (activeCategory === 'Tops') return ['tops', 'clothing'].includes(i.category) && !i.subcategory.includes('pant')
+          if (activeCategory === 'Bottoms') return ['bottoms', 'clothing'].includes(i.category) && i.subcategory.includes('pant')
+          if (activeCategory === 'Outerwear') return i.category === 'outerwear'
+          if (activeCategory === 'Traditional') return i.category === 'traditional'
+          if (activeCategory === 'One-Piece') return i.category === 'one-piece'
+          if (activeCategory === 'Footwear') return i.category === 'footwear'
+          if (activeCategory === 'Accessories') return ['accessories', 'jewelry', 'bag'].includes(i.category)
+          return true
+        })
 
   const stats = {
     total: wardrobe.length,
@@ -104,7 +106,6 @@ export default function WardrobePage() {
 
   return (
     <div className="min-h-screen pb-24 font-ui text-[var(--text-primary)]">
-      <GlassNav />
 
       <main className="max-w-[90rem] mx-auto px-6 pt-12 space-y-16">
         
@@ -172,23 +173,35 @@ export default function WardrobePage() {
           </ScrollReveal>
         )}
 
-        {/* CATEGORY NAV */}
+        {/* CATEGORY NAV & SEARCH */}
         {view === 'grid' && (
-          <div className="glass-crystal rounded-[2rem] p-2 flex overflow-x-auto hide-scrollbar gap-2 sticky top-24 z-30 shadow-elevated">
-            {CATEGORIES.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`relative px-8 py-3 text-sm tracking-widest uppercase font-medium transition-all whitespace-nowrap rounded-[1.5rem] ${
-                  activeCategory === cat ? 'text-[var(--bg-primary)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                }`}
-              >
-                {activeCategory === cat && (
-                  <motion.div layoutId="wardrobeCat" className="absolute inset-0 bg-[var(--text-primary)] -z-10 shadow-md rounded-[1.5rem]" />
-                )}
-                {cat}
-              </button>
-            ))}
+          <div className="flex flex-col md:flex-row gap-4 sticky top-24 z-30">
+            <div className="glass-crystal rounded-[2rem] p-2 flex overflow-x-auto hide-scrollbar gap-2 shadow-elevated flex-1">
+              {CATEGORIES.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => { setActiveCategory(cat); setSearchQuery(''); }}
+                  className={`relative px-8 py-3 text-sm tracking-widest uppercase font-medium transition-all whitespace-nowrap rounded-[1.5rem] ${
+                    activeCategory === cat && !searchQuery ? 'text-[var(--bg-primary)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                  }`}
+                >
+                  {activeCategory === cat && !searchQuery && (
+                    <motion.div layoutId="wardrobeCat" className="absolute inset-0 bg-[var(--text-primary)] -z-10 shadow-md rounded-[1.5rem]" />
+                  )}
+                  {cat}
+                </button>
+              ))}
+            </div>
+            
+            <div className="glass-crystal rounded-[2rem] p-2 shadow-elevated w-full md:w-96 flex">
+               <input 
+                 type="text" 
+                 placeholder="Search e.g. 'formal black dress'..." 
+                 value={searchQuery}
+                 onChange={(e) => setSearchQuery(e.target.value)}
+                 className="bg-transparent border-none outline-none px-6 py-3 w-full text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] tracking-wide"
+               />
+            </div>
           </div>
         )}
 
@@ -229,10 +242,19 @@ export default function WardrobePage() {
                       <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-transparent to-transparent opacity-0 group-hover:opacity-90 transition-opacity duration-500" />
                       
                       <button 
-                        onClick={() => { toggleFavoriteItem(item.id); setWardrobe([...wardrobe]); }}
+                        onClick={() => { toggleFavoriteItem(item.id); setWardrobe([...getWardrobe()]); }}
                         className="absolute top-6 right-6 text-2xl drop-shadow-md z-10 transition-transform hover:scale-125 text-[var(--text-primary)] glass-crystal w-10 h-10 flex items-center justify-center rounded-full"
                       >
                         {item.favorite ? '♥' : '♡'}
+                      </button>
+
+                      {/* Delete button top left */}
+                      <button 
+                        onClick={() => { deleteItem(item.id); setWardrobe([...getWardrobe()]); }}
+                        className="absolute top-6 left-6 text-xl drop-shadow-md z-10 transition-transform hover:scale-110 text-red-400 glass-crystal w-10 h-10 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100"
+                        title="Remove from Wardrobe"
+                      >
+                        ✕
                       </button>
 
                       <div className="absolute bottom-0 left-0 right-0 p-8 translate-y-6 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
@@ -242,14 +264,40 @@ export default function WardrobePage() {
                           <span className="glass-soft px-2 py-1 rounded-md">{item.formality}</span>
                         </div>
                         <div className="mt-6 flex gap-3">
-                          <button className="flex-1 py-3 text-xs font-medium uppercase tracking-widest text-[var(--text-primary)] glass-crystal hover:bg-[var(--text-primary)] hover:text-[var(--bg-primary)] transition-colors rounded-full">Edit</button>
-                          <button className="flex-1 py-3 text-xs font-medium uppercase tracking-widest text-[var(--text-primary)] glass-crystal hover:bg-[var(--text-primary)] hover:text-[var(--bg-primary)] transition-colors rounded-full">Compose</button>
+                          <button 
+                            onClick={() => {
+                              const newCat = window.prompt('Update category (tops, bottoms, outerwear, footwear, accessories, one-piece, traditional):', item.category)
+                              if (newCat) {
+                                updateItem(item.id, { category: newCat.toLowerCase() })
+                                setWardrobe([...getWardrobe()])
+                              }
+                            }}
+                            className="flex-1 py-3 text-xs font-medium uppercase tracking-widest text-[var(--text-primary)] glass-crystal hover:bg-[var(--text-primary)] hover:text-[var(--bg-primary)] transition-colors rounded-full"
+                          >
+                            Edit
+                          </button>
+                          <button onClick={() => setView('generate')} className="flex-1 py-3 text-xs font-medium uppercase tracking-widest text-[var(--text-primary)] glass-crystal hover:bg-[var(--text-primary)] hover:text-[var(--bg-primary)] transition-colors rounded-full">Compose</button>
                         </div>
                       </div>
                     </div>
                   </ScrollReveal>
                 ))}
               </div>
+
+              {filteredWardrobe.length === 0 && (
+                <ScrollReveal>
+                  <div className="text-center py-32 glass-deep rounded-[3rem] px-8 relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-[var(--text-primary)] to-transparent opacity-[0.02] group-hover:opacity-[0.04] transition-opacity duration-1000" />
+                    <h3 className="font-serif text-4xl mb-6 text-[var(--text-primary)] font-normal relative z-10">Digital Void</h3>
+                    <p className="text-[var(--text-muted)] text-lg mb-10 max-w-lg mx-auto leading-relaxed relative z-10">Your collection awaits initialization. Ingest garments to establish your foundational wardrobe architecture.</p>
+                    <div className="relative z-10">
+                      <GlassButton variant="primary" onClick={() => setView('upload')} className="px-12 py-5 shadow-elevated">
+                        Initialize Inventory
+                      </GlassButton>
+                    </div>
+                  </div>
+                </ScrollReveal>
+              )}
             </motion.div>
           )}
 

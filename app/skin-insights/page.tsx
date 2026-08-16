@@ -1,486 +1,284 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { GlassNav } from '@/components/ui/GlassNav'
 import { GlassButton } from '@/components/ui/GlassButton'
-import { BeforeAfterSlider } from '@/components/ui/BeforeAfterSlider'
 import { UploadZone } from '@/components/ui/UploadZone'
-import { ScrollReveal, StaggerReveal, staggerChildVariants } from '@/components/ui/ScrollReveal'
+import { CinematicAtmosphere } from '@/components/ui/CinematicAtmosphere'
+import { ScrollReveal } from '@/components/ui/ScrollReveal'
+import { ImageWithFallback } from '@/components/ui/ImageWithFallback'
 import { getSkinProvider, isDemoMode } from '@/lib/youcam'
-import {
-  getGeneralCareGuidance,
-  rankConcernsByPriority,
-  getSkinHistory,
-  logSkinHistory,
-  DAILY_BASIC_ROUTINE,
-  GENERAL_PRECAUTIONS,
-  WHEN_TO_SEE_DERMATOLOGIST,
-} from '@/lib/skincareEngine'
-import { getStoredProfile, saveProfile } from '@/lib/profileEngine'
 import type { SkinResult } from '@/lib/youcam/types'
-import type { SkinHistoryEntry } from '@/lib/skincareEngine'
+import { useRouter } from 'next/navigation'
 
-/* ── Animated Score Counter ─────────────────────────── */
-function AnimatedScore({ score, delay = 0 }: { score: number; delay?: number }) {
-  const [display, setDisplay] = useState(0)
-  const [started, setStarted] = useState(false)
-
-  useEffect(() => {
-    const t = setTimeout(() => setStarted(true), delay)
-    return () => clearTimeout(t)
-  }, [delay])
-
-  useEffect(() => {
-    if (!started) return
-    let current = 0
-    const dur = 800
-    const step = 20
-    const inc = score / (dur / step)
-    const timer = setInterval(() => {
-      current += inc
-      if (current >= score) { setDisplay(score); clearInterval(timer) }
-      else setDisplay(Math.round(current))
-    }, step)
-    return () => clearInterval(timer)
-  }, [score, started])
-
-  return <>{display}</>
-}
+type ViewState = 'landing' | 'uploading' | 'analyzing' | 'results'
 
 export default function SkinInsightsPage() {
+  const router = useRouter()
+  const [view, setView] = useState<ViewState>('landing')
+  
+  // Capture State
   const [selfiePreview, setSelfiePreview] = useState<string>('')
-  const [analyzing, setAnalyzing] = useState<boolean>(false)
-  const [skinResult, setSkinResult] = useState<SkinResult | null>(null)
-  const [history, setHistory] = useState<SkinHistoryEntry[]>([])
+  const [stagedFile, setStagedFile] = useState<File | null>(null)
+  
+  // Analysis State
+  const [analysisResult, setAnalysisResult] = useState<SkinResult | null>(null)
+  const [errorMsg, setErrorMsg] = useState('')
 
-  const isMock = isDemoMode()
+  async function handleFileSelect(file: File) {
+    // Basic validation for non-face images in demo mode via size hashing could go here
+    const url = URL.createObjectURL(file)
+    setSelfiePreview(url)
+    setStagedFile(file)
+  }
 
-  useEffect(() => {
-    setHistory(getSkinHistory())
-  }, [])
-
-  async function handleSelfieUpload(file: File) {
-    const previewUrl = URL.createObjectURL(file)
-    setSelfiePreview(previewUrl)
-    setAnalyzing(true)
-    setSkinResult(null)
-
+  async function runAnalysis() {
+    if (!stagedFile) return
+    setErrorMsg('')
+    setView('analyzing')
+    
     try {
       const provider = getSkinProvider()
-      const result = await provider.analyze(file)
-      setSkinResult(result)
-
-      if (result.signals.concerns.length > 0) {
-        logSkinHistory({
-          concerns: result.signals.concerns,
-          selfieUrl: previewUrl,
-        })
-        setHistory(getSkinHistory())
+      const result = await provider.analyze(stagedFile)
+      
+      if (result.status === 'failed') {
+        throw new Error(result.error || 'Analysis failed to process.')
       }
-
-      const currentProfile = getStoredProfile()
-      saveProfile({
-        ...currentProfile,
-        selfieUrl: previewUrl,
-        skinSignals: {
-          clarityScore: result.signals.clarityScore,
-          hydrationLevel: result.signals.hydrationLevel,
-          undertone: result.signals.undertone,
-          textureNotes: result.signals.textureNotes,
-        },
-      })
-    } finally {
-      setAnalyzing(false)
+      
+      setAnalysisResult(result)
+      setView('results')
+    } catch (e: any) {
+      setErrorMsg(e.message || 'Please upload a clear photo showing one face.')
+      setView('landing')
     }
   }
 
-  const prioritizedConcerns = skinResult?.signals.concerns
-    ? rankConcernsByPriority(skinResult.signals.concerns)
-    : []
-
   return (
-    <div className="min-h-screen pb-24 font-ui text-[var(--text-primary)]">
+    <div className="min-h-screen pb-32 font-ui text-[var(--text-primary)] relative">
       <GlassNav />
+      {/* Background specific to Skin Lab (pearl, soft champagne, liquid motion) */}
+      <div className="fixed inset-0 z-[-1] pointer-events-none opacity-60">
+        <CinematicAtmosphere />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[rgba(255,220,200,0.03)] to-[rgba(200,180,255,0.02)] mix-blend-overlay" />
+      </div>
 
-      <main className="max-w-[85rem] mx-auto px-6 pt-12 space-y-16">
-        {/* ═══ PAGE HEADER ════════════════════════════════════════════ */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-3xl space-y-4"
-        >
-          <span className="premium-badge">
-            YouCam Skin Intelligence
-          </span>
-          <h1 className="font-serif text-5xl lg:text-6xl text-[var(--text-primary)] font-normal tracking-tight">
-            Analyze your skin.
-          </h1>
-          <p className="text-[var(--text-muted)] text-lg leading-relaxed max-w-2xl">
-            A visual diagnostic assessing hydration, clarity, and undertone. Receive specialized care regimens and verifiable aesthetic recommendations.
-          </p>
-        </motion.div>
+      <main className="max-w-[90rem] mx-auto px-6 pt-16 md:pt-24 space-y-24">
+        <AnimatePresence mode="wait">
 
-        {/* ═══ SAFETY DISCLAIMER ═══════════════════════════════════════ */}
-        <ScrollReveal>
-          <div className="glass-soft p-6 flex items-start gap-4 rounded-3xl relative overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--text-primary)] to-transparent opacity-[0.02] group-hover:translate-x-full transition-transform duration-[2000ms] ease-in-out" />
-            <span className="font-bold uppercase tracking-widest text-xs mt-0.5 z-10">Notice</span>
-            <div className="text-[var(--text-muted)] leading-relaxed text-sm z-10">
-              This system provides AI-assisted visual skin observations and general skincare routine guidance. It is <strong>not a medical diagnosis or treatment prescription</strong>. For persistent, severe, or painful skin concerns, always consult a qualified dermatologist.
-            </div>
-          </div>
-        </ScrollReveal>
-
-        {/* ═══ SELFIE UPLOAD & GUIDELINES ══════════════════════════════ */}
-        <ScrollReveal>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="md:col-span-1 h-full">
-              <UploadZone
-                label="Reference Portrait"
-                sublabel="Upload photo for Skin Analysis"
-                currentPreview={selfiePreview}
-                loading={analyzing}
-                onFileSelect={handleSelfieUpload}
-              />
-            </div>
-
-            <div className="glass-soft p-8 md:col-span-2 space-y-6 rounded-3xl relative overflow-hidden">
-              <h3 className="font-serif text-3xl text-[var(--text-primary)] font-normal relative z-10">Capture Requirements</h3>
-              <div className="grid grid-cols-2 gap-6 text-sm text-[var(--text-muted)] relative z-10">
-                {[
-                  { label: 'Lighting', text: 'Diffuse, natural daylight' },
-                  { label: 'Subject', text: 'Clear, unobstructed face' },
-                  { label: 'Expression', text: 'Neutral facial musculature' },
-                  { label: 'Framing', text: 'Single individual centered' },
-                ].map(item => (
-                  <div key={item.text} className="flex flex-col border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] pt-4">
-                    <span className="text-xs uppercase tracking-widest font-medium mb-1 text-[var(--text-primary)]">{item.label}</span> 
-                    <span>{item.text}</span>
+          {/* 1. HERO & UPLOAD SECTION */}
+          {(view === 'landing' || view === 'uploading') && (
+            <motion.section 
+              key="landing" 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0, y: -20, filter: 'blur(10px)' }} 
+              className="grid lg:grid-cols-2 gap-16 items-center min-h-[80vh]"
+            >
+              <div className="space-y-8 z-10">
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+                  <span className="premium-badge">✨ Beauty Laboratory</span>
+                  <h1 className="font-serif text-5xl lg:text-7xl font-normal leading-[1.05] tracking-tight">
+                    Understand your skin.<br/>
+                    <span className="italic text-[var(--text-muted)] text-3xl lg:text-5xl block mt-4">See what your skin analysis can tell you.</span>
+                  </h1>
+                </motion.div>
+                
+                {isDemoMode() && (
+                  <div className="inline-block glass-crystal px-4 py-2 rounded-full border border-orange-500/20 text-orange-400/80 text-xs tracking-widest uppercase">
+                    Demo Mode — Sample analysis preview
                   </div>
-                ))}
+                )}
+                
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="pt-4">
+                  {!stagedFile ? (
+                     <div className="glass-deep rounded-[3rem] p-8 max-w-md">
+                       <UploadZone
+                         label="Portrait Upload"
+                         sublabel="Upload a clear face photo"
+                         currentPreview={selfiePreview}
+                         loading={false}
+                         onFileSelect={handleFileSelect}
+                       />
+                       {errorMsg && <p className="text-red-400 text-sm mt-4 text-center">{errorMsg}</p>}
+                     </div>
+                  ) : (
+                    <div className="glass-deep rounded-[3rem] p-8 max-w-md space-y-6 text-center">
+                       <div className="w-32 h-32 mx-auto rounded-full overflow-hidden border border-[var(--border-color)]">
+                         <img src={selfiePreview} alt="Preview" className="w-full h-full object-cover" />
+                       </div>
+                       <GlassButton variant="primary" onClick={runAnalysis} className="w-full py-4 text-lg">
+                         Analyze My Skin ✦
+                       </GlassButton>
+                       <button onClick={() => setStagedFile(null)} className="text-sm text-[var(--text-muted)] underline underline-offset-4">
+                         Choose different photo
+                       </button>
+                    </div>
+                  )}
+                </motion.div>
               </div>
 
-              {!skinResult && !analyzing && (
-                <div className="mt-8 pt-6 border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] text-sm text-[var(--text-muted)] italic relative z-10">
-                  Upload a reference image to initiate diagnostics and populate your aesthetic profile.
-                </div>
-              )}
-            </div>
-          </div>
-        </ScrollReveal>
+              <motion.div 
+                initial={{ opacity: 0, filter: 'blur(20px)', scale: 1.05 }}
+                animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
+                transition={{ duration: 1.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                className="relative aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl group w-full max-w-md lg:max-w-full mx-auto"
+              >
+                <img src="https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?w=1200&q=80" alt="Skincare Laboratory" className="w-full h-full object-cover grayscale-[20%] group-hover:scale-[1.03] transition-transform duration-[3000ms]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)]/80 via-transparent to-transparent pointer-events-none" />
+              </motion.div>
+            </motion.section>
+          )}
 
-        {/* ═══ RESULTS ════════════════════════════════════════════════ */}
-        {skinResult && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="space-y-20 pt-10"
-          >
-            {/* ── SECTION 1: WHAT WE FOUND ─────────────────────────── */}
-            <ScrollReveal>
-              <div>
-                <div className="flex justify-between items-end border-b border-[var(--border-color)] pb-4 mb-8">
-                  <div>
-                    <h2 className="font-serif text-4xl font-normal text-[var(--text-primary)]">Diagnostic Summary</h2>
+          {/* 2. ANALYZING LOADING STATE */}
+          {view === 'analyzing' && (
+            <motion.section 
+              key="analyzing" 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }} 
+              className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-12"
+            >
+              <div className="relative">
+                <div className="w-40 h-40 absolute inset-0 bg-[var(--text-primary)] opacity-5 rounded-full blur-2xl animate-pulse" />
+                <svg className="w-32 h-32 text-[var(--text-primary)] animate-spin-slow" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="0.5">
+                  <circle cx="50" cy="50" r="45" strokeDasharray="100 40" strokeLinecap="round" />
+                  <circle cx="50" cy="50" r="35" strokeDasharray="40 20" strokeLinecap="round" strokeOpacity="0.5" className="origin-center animate-[spin_4s_linear_reverse_infinite]" />
+                  <circle cx="50" cy="50" r="25" strokeDasharray="20 10" strokeLinecap="round" strokeOpacity="0.3" className="origin-center animate-[spin_2s_linear_infinite]" />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                   <div className="w-16 h-16 rounded-full overflow-hidden opacity-50 animate-pulse">
+                     <img src={selfiePreview} className="w-full h-full object-cover grayscale" alt="scanning" />
+                   </div>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <h2 className="font-serif text-4xl font-normal text-[var(--text-primary)] tracking-widest uppercase">Biometric Scan</h2>
+                <p className="text-[var(--text-muted)] text-lg">Evaluating hydration, clarity, and texture.</p>
+              </div>
+            </motion.section>
+          )}
+
+          {/* 3. RESULTS DISPLAY */}
+          {view === 'results' && analysisResult && (
+            <motion.section key="results" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="space-y-32">
+              
+              {/* SECTION: YOUR ANALYSIS */}
+              <div className="grid md:grid-cols-2 gap-16 items-start">
+                <div className="sticky top-32 space-y-8">
+                  <div className="aspect-[4/5] relative rounded-[2rem] overflow-hidden shadow-2xl group">
+                    <img src={selfiePreview} alt="Your Face" className="w-full h-full object-cover" />
+                    {/* Simulated scanning lines for effect */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[var(--text-primary)]/10 to-transparent h-[10%] animate-[scan_4s_ease-in-out_infinite]" />
                   </div>
-                  <span className="text-xs text-[var(--text-muted)] uppercase tracking-widest font-medium">Ranked by severity</span>
+                  {isDemoMode() && (
+                    <p className="text-xs text-center text-[var(--text-muted)] italic">
+                      Demo Analysis: Sample values for demonstration only.
+                    </p>
+                  )}
                 </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
-                  {prioritizedConcerns.map((c, idx) => (
-                    <motion.div
-                      key={c.id}
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{ duration: 0.6, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                      className="glass-frosted p-6 text-center rounded-3xl relative overflow-hidden group hover:scale-[1.02] transition-transform duration-500"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-b from-[var(--text-primary)] to-transparent opacity-[0.02] group-hover:opacity-[0.05] transition-opacity duration-500" />
-                      <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-widest block mb-4 truncate relative z-10">
-                        {c.name}
-                      </span>
-                      <div className="font-numeric text-5xl font-light text-[var(--text-primary)] relative z-10 tracking-tighter">
-                        <AnimatedScore score={c.score} delay={idx * 100} />
-                      </div>
-                      <span className="text-[10px] text-[var(--text-muted)] mt-1 block uppercase tracking-widest font-medium relative z-10">out of 100</span>
-                      <div className={`mt-4 pt-4 border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)] text-[10px] uppercase tracking-widest font-bold relative z-10 ${
-                        c.level === 'high' ? 'text-amber-600' : 'text-emerald-600'
-                      }`}>
-                        {c.level} signal
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </ScrollReveal>
-
-            {/* ── INTERACTIVE BEFORE/AFTER OVERLAY SLIDER ────────── */}
-            <ScrollReveal>
-              <div className="space-y-6">
-                <div className="flex items-end justify-between border-b border-[var(--border-color)] pb-4">
-                  <h3 className="font-serif text-3xl font-normal text-[var(--text-primary)]">Visual Mapping</h3>
-                  <span className="text-xs font-medium uppercase tracking-widest text-[var(--text-muted)]">Interactive Overlay</span>
-                </div>
-
-                <div className="aspect-[16/9] md:aspect-[21/9] bg-[var(--surface)] border border-[var(--border-color)] p-2">
-                  <BeforeAfterSlider
-                    beforeImage={selfiePreview}
-                    afterImage={skinResult.overlays?.[0] || selfiePreview}
-                    beforeLabel="Source"
-                    afterLabel="Analysis"
-                  />
-                </div>
-              </div>
-            </ScrollReveal>
-
-            {/* ── SECTION 2 & 3: WHAT IT COULD MEAN & CONTRIBUTORS ── */}
-            <ScrollReveal>
-              <div className="space-y-8">
-                <div className="border-b border-[var(--border-color)] pb-4">
-                  <h3 className="font-serif text-3xl font-normal text-[var(--text-primary)]">Pathology & Contributors</h3>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-8">
-                  {prioritizedConcerns.map((c, idx) => {
-                    const guidance = getGeneralCareGuidance(c)
-                    return (
-                      <motion.div
-                        key={c.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5, delay: idx * 0.1 }}
-                        className="p-8 glass-soft rounded-3xl space-y-6"
-                      >
-                        <div className="flex items-end justify-between border-b border-[var(--border-color)] pb-4">
-                          <h4 className="font-serif text-2xl font-normal text-[var(--text-primary)]">{guidance.concernName}</h4>
-                          <span className="text-xs uppercase tracking-widest text-[var(--text-muted)]">Score: {c.score}</span>
-                        </div>
-
-                        <div className="text-sm text-[var(--text-muted)] leading-relaxed space-y-4">
-                          <div>
-                            <strong className="text-[var(--text-primary)] block mb-1 uppercase tracking-widest text-xs font-medium">Mechanism</strong>
-                            {guidance.explanation}
-                          </div>
-
-                          <div>
-                            <strong className="text-[var(--text-primary)] block mb-2 uppercase tracking-widest text-xs font-medium">Environmental & Internal Factors</strong>
-                            <ul className="list-disc list-inside space-y-1 text-sm">
-                              {guidance.possibleContributors.map((factor, fIdx) => (
-                                <li key={fIdx}>{factor}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )
-                  })}
-                </div>
-              </div>
-            </ScrollReveal>
-
-            {/* ── SECTION 4: WHAT YOU CAN DO ────────────────────── */}
-            <ScrollReveal>
-              <div className="space-y-8">
-                <div className="border-b border-[var(--border-color)] pb-4">
-                  <h3 className="font-serif text-3xl font-normal text-[var(--text-primary)]">Treatment Directives</h3>
-                  <p className="text-sm text-[var(--text-muted)] mt-2">Safe clinical parameters for managing observed concerns.</p>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-8">
-                  {prioritizedConcerns.slice(0, 2).map(c => {
-                    const guidance = getGeneralCareGuidance(c)
-                    return (
-                      <div key={c.id} className="space-y-6">
-                        <h4 className="font-serif text-2xl font-normal text-[var(--text-primary)]">{guidance.concernName}</h4>
-
-                        <div className="text-sm text-[var(--text-muted)] space-y-3 border-l border-[var(--border-color)] pl-4">
-                          <strong className="text-[var(--text-primary)] block text-xs uppercase tracking-widest">Protocol</strong>
-                          <ul className="space-y-2 leading-relaxed">
-                            {guidance.generalSuggestions.map((sug, i) => (
-                              <li key={i}>— {sug}</li>
-                            ))}
-                          </ul>
-                        </div>
-
-                        <div className="text-sm text-[var(--text-muted)] space-y-3 border-l border-[var(--border-color)] pl-4">
-                          <strong className="text-[var(--text-primary)] block text-xs uppercase tracking-widest">Contraindications</strong>
-                          <ul className="space-y-2 leading-relaxed">
-                            {guidance.thingsToAvoid.map((avoid, aIdx) => (
-                              <li key={aIdx}>— {avoid}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            </ScrollReveal>
-
-            {/* ── SECTION 5: DAILY BASIC ROUTINE ────────────────── */}
-            <ScrollReveal>
-              <div className="space-y-8">
-                <div className="border-b border-[var(--border-color)] pb-4">
-                  <h3 className="font-serif text-3xl font-normal text-[var(--text-primary)]">Baseline Regimen</h3>
-                  <p className="text-sm text-[var(--text-muted)] mt-2">
-                    AAD-aligned clinical foundation.
-                  </p>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-12">
+                
+                <div className="space-y-16">
                   <div className="space-y-6">
-                    <h4 className="font-serif text-2xl font-normal text-[var(--text-primary)]">AM Protocol</h4>
-                    <div className="space-y-4 text-sm">
-                      {DAILY_BASIC_ROUTINE.morning.map(step => (
-                        <div key={step.step} className="glass-soft p-6 rounded-2xl">
-                          <span className="uppercase tracking-widest text-[var(--text-primary)] block mb-2 text-xs font-medium">
-                            0{step.step} // {step.title}
-                          </span>
-                          <span className="text-[var(--text-muted)] leading-relaxed block">{step.desc}</span>
+                    <span className="premium-badge">Analysis Complete</span>
+                    <h1 className="font-serif text-5xl md:text-6xl font-normal">What We Noticed</h1>
+                    <p className="text-xl text-[var(--text-muted)] leading-relaxed">
+                      {analysisResult.signals.textureNotes}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-6">
+                    {[
+                      { label: 'Overall Clarity', value: analysisResult.signals.clarityScore + '/100' },
+                      { label: 'Hydration', value: analysisResult.signals.hydrationLevel },
+                      { label: 'Undertone', value: analysisResult.signals.undertone }
+                    ].map((stat, i) => (
+                      <div key={i} className="glass-soft p-6 rounded-3xl">
+                        <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-widest mb-2">{stat.label}</div>
+                        <div className="font-serif text-3xl capitalize text-[var(--text-primary)]">{stat.value}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* SECTION: MEANING & ACTIONS */}
+                  <div className="space-y-8">
+                    <h2 className="font-serif text-4xl border-b border-[var(--border-color)] pb-4">Concerns & Contributors</h2>
+                    {analysisResult.signals.concerns.map(c => (
+                      <div key={c.id} className="glass-deep p-8 rounded-3xl space-y-4">
+                        <div className="flex justify-between items-center">
+                           <h4 className="font-medium text-xl">{c.name}</h4>
+                           <span className={`text-xs uppercase tracking-widest px-3 py-1 rounded-full border ${c.level === 'high' ? 'border-orange-500/30 text-orange-500 bg-orange-500/5' : 'border-[var(--border-strong)] text-[var(--text-muted)]'}`}>
+                             {c.level} level
+                           </span>
+                        </div>
+                        <p className="text-sm text-[var(--text-muted)] leading-relaxed">
+                          <strong>What it can mean:</strong> {c.meaning}
+                        </p>
+                        <p className="text-sm text-[var(--text-muted)] leading-relaxed">
+                          <strong>What you can do:</strong> Focus on maintaining a consistent cleansing routine and use barrier-supporting products.
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION: ROUTINE & PRODUCTS */}
+              <ScrollReveal>
+                <div className="grid md:grid-cols-2 gap-16 items-start border-t border-[var(--border-color)] pt-24">
+                  <div className="space-y-10">
+                    <h2 className="font-serif text-5xl">Your Routine 🧴</h2>
+                    <p className="text-[var(--text-muted)]">A simple, effective structure to support your skin's architecture.</p>
+                    
+                    <div className="space-y-6">
+                      {[
+                        { title: 'Morning', desc: 'Gentle cleanse, antioxidant serum, moisturizer, and broad-spectrum SPF 30+.' },
+                        { title: 'Evening', desc: 'Double cleanse to remove SPF/makeup, targeted treatment (if needed), and nourishing moisturizer.' },
+                        { title: 'Weekly', desc: 'Gentle exfoliation 1-2 times a week to support cell turnover without compromising the barrier.' }
+                      ].map((step, i) => (
+                        <div key={i} className="glass-soft p-8 rounded-[2rem] relative overflow-hidden">
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-[var(--text-primary)] opacity-50" />
+                          <h4 className="font-medium text-xl mb-3">{step.title}</h4>
+                          <p className="text-[var(--text-muted)] leading-relaxed">{step.desc}</p>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  <div className="space-y-6">
-                    <h4 className="font-serif text-2xl font-normal text-[var(--text-primary)]">PM Protocol</h4>
-                    <div className="space-y-4 text-sm">
-                      {DAILY_BASIC_ROUTINE.evening.map(step => (
-                        <div key={step.step} className="glass-soft p-6 rounded-2xl">
-                          <span className="uppercase tracking-widest text-[var(--text-primary)] block mb-2 text-xs font-medium">
-                            0{step.step} // {step.title}
-                          </span>
-                          <span className="text-[var(--text-muted)] leading-relaxed block">{step.desc}</span>
+                  <div className="space-y-10">
+                    <h2 className="font-serif text-5xl">Product Categories</h2>
+                    <p className="text-[var(--text-muted)]">Ingredients and formulas to look for based on your scan.</p>
+                    
+                    <div className="grid gap-6">
+                      {[
+                        { name: 'Hydrating Cleanser', purpose: 'To cleanse without stripping natural oils.' },
+                        { name: 'Barrier Repair Cream', purpose: 'To address hydration levels and support skin health.' },
+                        { name: 'Mineral Sunscreen', purpose: 'Daily protection essential for all routines.' }
+                      ].map((prod, i) => (
+                        <div key={i} className="glass-deep p-6 rounded-2xl flex flex-col justify-center">
+                          <span className="font-medium mb-1 text-lg">{prod.name}</span>
+                          <span className="text-sm text-[var(--text-muted)]">{prod.purpose}</span>
                         </div>
                       ))}
                     </div>
-                  </div>
-                </div>
-              </div>
-            </ScrollReveal>
 
-            {/* ── SECTION 6: PRODUCT CATEGORIES & VERIFIED PRODUCTS ── */}
-            <ScrollReveal>
-              <div className="space-y-12">
-                <div className="border-b border-[var(--border-color)] pb-4">
-                  <h3 className="font-serif text-3xl font-normal text-[var(--text-primary)]">Verified Formulations</h3>
-                </div>
-
-                {prioritizedConcerns.slice(0, 2).map(c => {
-                  const guidance = getGeneralCareGuidance(c)
-                  return (
-                    <div key={c.id} className="space-y-6">
-                      <h4 className="font-medium text-sm text-[var(--text-primary)] uppercase tracking-widest">
-                        Target: {guidance.concernName}
+                    <div className="mt-12 p-6 border border-orange-500/20 bg-orange-500/5 rounded-2xl">
+                      <h4 className="text-orange-400/80 font-medium text-sm tracking-widest uppercase mb-2 flex items-center gap-2">
+                        <span>👩‍⚕️</span> Professional Advice
                       </h4>
-
-                      <div className="grid md:grid-cols-2 gap-6">
-                        {guidance.matchedProducts.map(prod => (
-                          <motion.div
-                            key={prod.id}
-                            whileHover={{ y: -4, scale: 1.01 }}
-                            className="p-6 glass-frosted rounded-3xl space-y-4 text-sm group"
-                          >
-                            <div className="flex justify-between items-start border-b border-[var(--border-color)] pb-4">
-                              <div>
-                                <span className="text-[10px] uppercase tracking-widest text-[var(--text-muted)] block mb-1">
-                                  {prod.brand}
-                                </span>
-                                <h5 className="font-medium text-[var(--text-primary)] text-lg">{prod.productName}</h5>
-                              </div>
-                              <span className="text-xs uppercase tracking-widest text-[var(--text-primary)] font-medium">
-                                {prod.category}
-                              </span>
-                            </div>
-
-                            <p className="text-[var(--text-muted)] leading-relaxed">
-                              {prod.whyRelevant}
-                            </p>
-
-                            <div className="flex flex-wrap gap-3 pt-2">
-                              {prod.fragranceFree && (
-                                <span className="text-[10px] uppercase tracking-widest font-medium text-[var(--text-muted)] border border-[var(--border-color)] px-2 py-1">
-                                  Fragrance-Free
-                                </span>
-                              )}
-                              {prod.nonComedogenic && (
-                                <span className="text-[10px] uppercase tracking-widest font-medium text-[var(--text-muted)] border border-[var(--border-color)] px-2 py-1">
-                                  Non-comedogenic
-                                </span>
-                              )}
-                            </div>
-                          </motion.div>
-                        ))}
-                      </div>
+                      <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+                        This AI scan is an educational tool, not a medical diagnosis. If you experience painful breakouts, severe redness, or changing moles, please consult a board-certified dermatologist.
+                      </p>
                     </div>
-                  )
-                })}
-              </div>
-            </ScrollReveal>
-
-            {/* ── SECTION 7 & 8: PRECAUTIONS & DERMATOLOGIST ──────────── */}
-            <div className="grid md:grid-cols-2 gap-8">
-              <ScrollReveal>
-                <div className="space-y-6">
-                  <div className="border-b border-[var(--border-color)] pb-4">
-                    <h3 className="font-serif text-3xl font-normal text-[var(--text-primary)]">Clinical Precautions</h3>
-                  </div>
-
-                  <div className="space-y-4 text-sm text-[var(--text-muted)] border-l border-[var(--border-color)] pl-4">
-                    {GENERAL_PRECAUTIONS.map((rule, rIdx) => (
-                      <div key={rIdx} className="leading-relaxed">
-                        — {rule}
-                      </div>
-                    ))}
                   </div>
                 </div>
               </ScrollReveal>
 
-              <ScrollReveal>
-                <div className="space-y-6">
-                  <div className="border-b border-[var(--border-color)] pb-4">
-                    <h3 className="font-serif text-3xl font-normal text-[var(--text-primary)]">Professional Evaluation</h3>
-                  </div>
+            </motion.section>
+          )}
 
-                  <div className="space-y-4 text-sm text-[var(--text-muted)] border-l border-[var(--border-color)] pl-4">
-                    {WHEN_TO_SEE_DERMATOLOGIST.map((item, dIdx) => (
-                      <div key={dIdx} className="leading-relaxed">
-                        — {item}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </ScrollReveal>
-            </div>
-
-            {/* ── SECTION 9: TRACK 3 INTEGRATION ──────────────────── */}
-            <ScrollReveal>
-              <div className="glass-deep rounded-3xl p-12 text-center max-w-2xl mx-auto space-y-6 mt-12 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[var(--text-primary)] to-transparent opacity-[0.03] pointer-events-none" />
-                <span className="text-xs uppercase tracking-widest text-[var(--text-muted)] font-medium block relative z-10">
-                  System Integration
-                </span>
-                <h3 className="font-serif text-4xl font-normal text-[var(--text-primary)] relative z-10">Compile Visual Profile</h3>
-                <p className="text-sm text-[var(--text-muted)] leading-relaxed relative z-10">
-                  Your biometric data has been logged. Incorporate this analysis into ContextMirror to evaluate comprehensive aesthetics.
-                </p>
-
-                <div className="pt-4 relative z-10">
-                  <Link href="/test-look">
-                    <GlassButton variant="primary" className="text-sm py-4 px-10">
-                      Proceed to Context Evaluation
-                    </GlassButton>
-                  </Link>
-                </div>
-              </div>
-            </ScrollReveal>
-          </motion.div>
-        )}
+        </AnimatePresence>
       </main>
     </div>
   )

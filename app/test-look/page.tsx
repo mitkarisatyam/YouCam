@@ -3,7 +3,6 @@
 import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { GlassNav } from '@/components/ui/GlassNav'
 import { GlassButton } from '@/components/ui/GlassButton'
 import { ScoreRing } from '@/components/ui/ScoreRing'
 import { BeforeAfterSlider } from '@/components/ui/BeforeAfterSlider'
@@ -83,8 +82,9 @@ function TestLookContent() {
   // Step 4, 5 & 6: Focus & Experiment
   const [selectedCandidate, setSelectedCandidate] = useState<LookCandidate | null>(null)
   
-  // Step 6: Change One Thing
   const [experiment, setExperiment] = useState<ChangeOneThingExperiment | null>(null)
+  const [experimentImage, setExperimentImage] = useState<string>('')
+  const [isExperimenting, setIsExperimenting] = useState(false)
   const [changeItem, setChangeItem] = useState('jacket')
   const [changeValue, setChangeValue] = useState('')
 
@@ -163,10 +163,21 @@ function TestLookContent() {
     }
   }
 
-  function handleRunExperiment() {
+  async function handleRunExperiment() {
     if (!selectedCandidate || !changeValue) return
+    setIsExperimenting(true)
     const exp = runChangeOneThing(selectedCandidate, context, profile, changeItem, changeValue)
     setExperiment(exp)
+    
+    try {
+      const vtoProvider = getApparelVTOProvider()
+      const res = await vtoProvider.generate('selfie-id', `mock-garment-${Date.now()}`, 'cloth')
+      setExperimentImage(res.imageUrl || 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&q=80')
+    } catch {
+      setExperimentImage('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&q=80')
+    } finally {
+      setIsExperimenting(false)
+    }
   }
 
   function handleSaveDecision() {
@@ -183,7 +194,6 @@ function TestLookContent() {
 
   return (
     <div className="min-h-screen pb-24 font-ui text-[var(--text-primary)]">
-      <GlassNav />
 
       <main className="max-w-[85rem] mx-auto px-6 pt-12 space-y-16">
         {/* ═══ PROGRESS NAV ═════════════════════════════════════════ */}
@@ -807,19 +817,19 @@ function TestLookContent() {
                 </div>
 
                 <div className="flex justify-center pt-8 border-t border-[color-mix(in_srgb,var(--border-color)_50%,transparent)]">
-                   <GlassButton variant="primary" onClick={handleRunExperiment} disabled={!changeValue} className="px-16 py-5 text-base shadow-elevated">
-                     Execute Substitution
+                   <GlassButton variant="primary" onClick={handleRunExperiment} disabled={!changeValue || isExperimenting} className="px-16 py-5 text-base shadow-elevated">
+                     {isExperimenting ? 'Synthesizing Alteration...' : 'Execute Substitution'}
                    </GlassButton>
                 </div>
               </div>
 
-              {experiment && (
+              {experiment && !isExperimenting && (
                 <ScrollReveal>
                   <div className="grid md:grid-cols-2 gap-16 max-w-6xl mx-auto items-center pt-12">
                     <div className="aspect-[3/4] glass-soft p-4 rounded-[3rem] shadow-elevated">
                       <BeforeAfterSlider
                         beforeImage={selectedCandidate.vtoResultUrl || ''}
-                        afterImage="https://images.unsplash.com/photo-1594938298603-c8148c4b4e5b?w=600&q=80" // Mock image for now
+                        afterImage={experimentImage}
                         beforeLabel={`PREVIOUS (${experiment.beforeScore})`}
                         afterLabel={`REVISED (${experiment.afterScore})`}
                       />

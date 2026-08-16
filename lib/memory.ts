@@ -34,6 +34,11 @@ export function updateItem(id: string, patch: Partial<WardrobeItem>) {
   saveWardrobe(wardrobe.map(i => i.id === id ? { ...i, ...patch } : i))
 }
 
+export function deleteItem(id: string) {
+  const wardrobe = getWardrobe()
+  saveWardrobe(wardrobe.filter(i => i.id !== id))
+}
+
 export function toggleFavoriteItem(id: string) {
   const wardrobe = getWardrobe()
   saveWardrobe(wardrobe.map(i => i.id === id ? { ...i, favorite: !i.favorite } : i))

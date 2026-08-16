@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { GlassNav } from '@/components/ui/GlassNav'
 import { getStoredProfile, saveProfile, generateProfileFromSelfie } from '@/lib/profileEngine'
 import { getHairPreferences, getHairHistory, getWardrobe } from '@/lib/memory'
 import type { PersonalProfile, HairPreferences, HairProfile, WardrobeItem } from '@/types'
@@ -42,7 +41,6 @@ export default function ProfilePage() {
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1512496015851-a1e127db8fb5?q=80&w=2000')] opacity-5 mix-blend-overlay object-cover pointer-events-none" />
       </div>
       
-      <GlassNav />
 
       <main className="max-w-[85rem] mx-auto px-6 pt-16">
         

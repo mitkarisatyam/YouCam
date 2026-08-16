@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { GlassNav } from '@/components/ui/GlassNav'
 import { GlassButton } from '@/components/ui/GlassButton'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { THEMES, type ThemeName } from '@/components/ui/ThemeSwitcher'
@@ -35,15 +34,15 @@ export default function SettingsPage() {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('contextmirror_theme') as ThemeName
-    if (savedTheme) setCurrentTheme(savedTheme)
+    if (savedTheme) { setCurrentTheme(savedTheme); document.documentElement.setAttribute('data-theme', savedTheme); }
     const savedAppearance = localStorage.getItem('contextmirror_appearance') as typeof appearance
-    if (savedAppearance) setAppearance(savedAppearance)
+    if (savedAppearance) { setAppearance(savedAppearance); document.documentElement.setAttribute('data-appearance', savedAppearance); }
     const savedMotion = localStorage.getItem('contextmirror_motion')
-    if (savedMotion) setMotion_(savedMotion)
+    if (savedMotion) { setMotion_(savedMotion); document.documentElement.setAttribute('data-motion', savedMotion); }
     const savedBg = localStorage.getItem('contextmirror_background')
-    if (savedBg) setBackground(savedBg)
+    if (savedBg) { setBackground(savedBg); document.documentElement.setAttribute('data-background', savedBg); }
     const savedGlass = localStorage.getItem('contextmirror_glass')
-    if (savedGlass) setGlass(savedGlass)
+    if (savedGlass) { setGlass(savedGlass); document.documentElement.setAttribute('data-glass', savedGlass); }
   }, [])
 
   function changeTheme(themeId: ThemeName) {
@@ -66,6 +65,7 @@ export default function SettingsPage() {
   function saveSetting(key: string, value: string, setter: (v: string) => void) {
     setter(value)
     localStorage.setItem(`contextmirror_${key}`, value)
+    document.documentElement.setAttribute(`data-${key}`, value)
   }
 
   function clearData(key: string) {
@@ -81,7 +81,6 @@ export default function SettingsPage() {
         <div className="absolute top-[10%] left-[20%] w-[40%] h-[50%] bg-color-mix(in_srgb,var(--text-primary)_5%,transparent) blur-[150px] rounded-full pointer-events-none transition-all duration-1000" />
       </div>
 
-      <GlassNav />
 
       <main className="max-w-[85rem] mx-auto px-6 pt-16">
         

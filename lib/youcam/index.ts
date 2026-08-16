@@ -1,5 +1,5 @@
-import type { SkinProvider, ApparelVTOProvider } from './types'
-import { MockSkinProvider, MockApparelVTOProvider } from './mock'
+import type { SkinProvider, ApparelVTOProvider, HairProvider, HairstyleProvider } from './types'
+import { MockSkinProvider, MockApparelVTOProvider, MockHairProvider, MockHairstyleProvider } from './mock'
 import { YouCamSkinProvider } from './skin'
 import { YouCamApparelVTOProvider } from './apparel-vto'
 
@@ -18,6 +18,15 @@ export function getSkinProvider(): SkinProvider {
 
 export function getApparelVTOProvider(): ApparelVTOProvider {
   return isDemoMode() ? new MockApparelVTOProvider() : new YouCamApparelVTOProvider()
+}
+
+export function getHairProvider(): HairProvider {
+  // If YouCamHairProvider does not exist yet, fallback to Mock for both
+  return new MockHairProvider()
+}
+
+export function getHairstyleProvider(): HairstyleProvider {
+  return new MockHairstyleProvider()
 }
 
 export * from './types'

@@ -12,27 +12,31 @@ const MODE_CONFIGS: Record<AtmosphereMode, {
   color3: string
   particleCount: number
   particleColor: string
+  videoUrl?: string
 }> = {
   fashion: {
     color1: 'rgba(212, 175, 55, 0.1)',   // Gold
     color2: 'rgba(197, 160, 89, 0.08)',  // Warm neutral
     color3: 'rgba(255, 255, 255, 0.05)',
     particleCount: 12,
-    particleColor: 'rgba(255,255,255,0.4)'
+    particleColor: 'rgba(255,255,255,0.4)',
+    videoUrl: 'https://player.vimeo.com/external/394541706.sd.mp4?s=d008abfb393dc58dc6b4b47eb221146e297125ee&profile_id=164&oauth2_token_id=57447761' // Fashion fabric moving
   },
   skin: {
     color1: 'rgba(255, 218, 210, 0.15)', // Soft blush
     color2: 'rgba(212, 139, 152, 0.1)',  // Dusty rose
     color3: 'rgba(255, 240, 245, 0.08)',
     particleCount: 15,
-    particleColor: 'rgba(255,218,210,0.6)'
+    particleColor: 'rgba(255,218,210,0.6)',
+    videoUrl: 'https://player.vimeo.com/external/494254823.sd.mp4?s=d05978184c6c97a7cc2f1b8c0bb481fb47ef45db&profile_id=164&oauth2_token_id=57447761' // Water ripples / skin texture
   },
   hair: {
     color1: 'rgba(160, 160, 180, 0.1)',  // Silver
     color2: 'rgba(190, 180, 200, 0.08)', // Lavender tint
     color3: 'rgba(200, 200, 215, 0.05)',
     particleCount: 20,
-    particleColor: 'rgba(200,200,215,0.5)'
+    particleColor: 'rgba(200,200,215,0.5)',
+    videoUrl: 'https://player.vimeo.com/external/394541706.sd.mp4?s=d008abfb393dc58dc6b4b47eb221146e297125ee&profile_id=164&oauth2_token_id=57447761'
   },
   wardrobe: {
     color1: 'rgba(170, 160, 140, 0.12)', // Khaki / taupe
@@ -46,7 +50,8 @@ const MODE_CONFIGS: Record<AtmosphereMode, {
     color2: 'rgba(100, 100, 120, 0.1)',
     color3: 'rgba(197, 160, 89, 0.05)',  // Subtle gold accent
     particleCount: 8,
-    particleColor: 'rgba(255,255,255,0.3)'
+    particleColor: 'rgba(255,255,255,0.3)',
+    videoUrl: 'https://player.vimeo.com/external/477439567.sd.mp4?s=432651ed915f795db23668f4e2f9d6c757c9df25&profile_id=164&oauth2_token_id=57447761' // Dark abstract
   },
   default: {
     color1: 'rgba(200, 200, 200, 0.08)',
@@ -93,6 +98,27 @@ export function CinematicAtmosphere() {
   return (
     <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden bg-[var(--bg-primary)] transition-colors duration-1000">
       
+      {/* Background Video Layer */}
+      {config.videoUrl && (
+        <motion.div
+          key={config.videoUrl}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.15 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 2 }}
+          className="absolute inset-0 z-[-1] mix-blend-overlay pointer-events-none"
+        >
+          <video
+            src={config.videoUrl}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover filter blur-[2px] grayscale-[30%]"
+          />
+        </motion.div>
+      )}
+
       {/* Dynamic Animated Mesh Gradients */}
       <motion.div 
         className="absolute inset-0 opacity-70 mix-blend-screen"
@@ -130,6 +156,20 @@ export function CinematicAtmosphere() {
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 5 }}
         />
       </motion.div>
+
+      {/* Floating Shapes Layer */}
+      <div className="absolute inset-0 overflow-hidden mix-blend-overlay opacity-30">
+        <motion.svg viewBox="0 0 100 100" className="absolute top-[10%] left-[20%] w-[40vw] h-[40vw] filter blur-3xl opacity-40" fill={config.color1}
+          animate={{ rotate: [0, 90, 0], scale: [1, 1.5, 1], x: [0, 50, 0] }}
+          transition={{ duration: 40, repeat: Infinity, ease: "linear" }}>
+          <path d="M50,0 C80,0 100,20 100,50 C100,80 80,100 50,100 C20,100 0,80 0,50 C0,20 20,0 50,0 Z" />
+        </motion.svg>
+        <motion.svg viewBox="0 0 100 100" className="absolute bottom-[20%] right-[10%] w-[30vw] h-[30vw] filter blur-3xl opacity-30" fill={config.color2}
+          animate={{ rotate: [0, -90, 0], scale: [1, 1.2, 1], y: [0, -50, 0] }}
+          transition={{ duration: 35, repeat: Infinity, ease: "linear" }}>
+          <polygon points="50,0 100,25 100,75 50,100 0,75 0,25" />
+        </motion.svg>
+      </div>
 
       {/* Cinematic Particle System */}
       <div className="absolute inset-0">

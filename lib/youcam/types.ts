@@ -34,3 +34,26 @@ export interface SkinProvider {
 export interface ApparelVTOProvider {
   generate(selfieId: string, garmentUrl: string, category?: string): Promise<VTOResult>
 }
+
+export type HairResult = {
+  raw?: unknown
+  signals: {
+    hairType: 'straight' | 'wavy' | 'curly' | 'coily'
+    curlPattern?: string
+    density?: string
+    condition: 'healthy' | 'dry' | 'damaged' | 'oily'
+    color: string
+    textureNotes: string
+    concerns: SkinConcernScore[]
+  }
+  status: 'pending' | 'completed' | 'failed'
+  error?: string
+}
+
+export interface HairProvider {
+  analyze(selfieIdOrFile: string | File): Promise<HairResult>
+}
+
+export interface HairstyleProvider {
+  generate(selfieId: string, styleId: string, colorHex?: string): Promise<VTOResult>
+}
